@@ -111,6 +111,9 @@ export default function Appointments() {
         return;
     }
 
+    // Tutup dialog terlebih dahulu untuk menghindari freeze
+    setIsPrescriptionDialogOpen(false);
+
     const medIndex = allMedications.findIndex(med => med.id === selectedMedication);
     if (medIndex === -1) return;
 
@@ -125,7 +128,6 @@ export default function Appointments() {
     handleUpdateStatus(currentPatient.id, 'Selesai');
 
     toast({ title: "Resep Diberikan!", description: `${quantity} ${medToPrescribe.name} telah diresepkan untuk ${currentPatient.patientName}.` });
-    setIsPrescriptionDialogOpen(false);
   };
 
   return (
