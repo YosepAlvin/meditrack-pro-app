@@ -119,18 +119,31 @@ export default function Appointments() {
     
     if (medToPrescribe.stock < quantity) {
         toast({ title: "Stok Tidak Cukup!", description: `Stok ${medToPrescribe.name} hanya tersisa ${medToPrescribe.stock}.`, variant: "destructive" });
-        // Jangan tutup dialog jika stok tidak cukup, agar pengguna bisa mengoreksi
         return;
     }
     
-    // Tutup dialog SEKARANG, sebelum memodifikasi state lain
     setIsPrescriptionDialogOpen(false);
 
-    // Lanjutkan dengan logika bisnis
+    // Kurangi stok obat
     allMedications[medIndex].stock -= quantity;
-    handleUpdateStatus(currentPatient.id, 'Selesai');
 
-    toast({ title: "Resep Diberikan!", description: `${quantity} ${medToPrescribe.name} telah diresepkan untuk ${currentPatient.patientName}.` });
+    // Perbarui status janji temu menjadi 'Selesai' di state lokal dan global
+    const appointmentId = currentPatient.id;
+    setAppointments(currentAppointments =>
+      currentAppointments.map(app =>
+        app.id === appointmentId ? { ...app, status: 'Selesai' } : app
+      )
+    );
+    const globalIndex = allAppointments.findIndex(app => app.id === appointmentId);
+    if (globalIndex !== -1) {
+        allAppointments[globalIndex].status = 'Selesai';
+    }
+
+    // Tampilkan satu notifikasi yang benar
+    toast({ 
+        title: "Resep Diberikan & Selesai!", 
+        description: `${quantity} ${medToPrescribe.name} telah diresepkan untuk ${currentPatient.patientName}.` 
+    });
   };
 
   return (
