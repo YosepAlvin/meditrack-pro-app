@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -22,31 +22,49 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { doctors as initialDoctors } from "@/lib/data";
 import type { Doctor } from "@/lib/types";
-import { PlusCircle, MoreHorizontal } from "lucide-react";
+import { PlusCircle, MoreHorizontal, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function DoctorManagement() {
-  const [doctors, setDoctors] = useState<Doctor[]>(initialDoctors);
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingDoctor, setEditingDoctor] = useState<Doctor | null>(null);
-  const [newDoctor, setNewDoctor] = useState({ id: '', name: '', specialty: '', avatarUrl: '' });
+  const [newDoctor, setNewDoctor] = useState({ name: '', specialty: '' });
+  const { toast } = useToast();
+
+  async function fetchDoctors() {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/doctors');
+      if (!response.ok) throw new Error("Gagal mengambil data dokter.");
+      const data = await response.json();
+      setDoctors(data);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Terjadi kesalahan",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchDoctors();
+  }, []);
 
   const openAddDialog = () => {
     setEditingDoctor(null);
-    const newId = `dr-${newDoctor.name.toLowerCase().replace(/\s/g, '-') || Date.now()}`;
-    setNewDoctor({ 
-        id: newId, 
-        name: '', 
-        specialty: '', 
-        avatarUrl: `https://picsum.photos/seed/${newId}/100/100` 
-    });
+    setNewDoctor({ name: '', specialty: '' });
     setIsDialogOpen(true);
   };
 
   const openEditDialog = (doctor: Doctor) => {
     setEditingDoctor(doctor);
-    setNewDoctor(doctor);
+    setNewDoctor({ name: doctor.name, specialty: doctor.specialty });
     setIsDialogOpen(true);
   };
 
@@ -55,23 +73,72 @@ export default function DoctorManagement() {
     setEditingDoctor(null);
   };
 
-  const handleSaveDoctor = () => {
-    if (editingDoctor) {
-      setDoctors(docs => docs.map(d => (d.id === editingDoctor.id ? newDoctor : d)));
-    } else {
-      const id = `dr-${newDoctor.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
-      const doctorToAdd: Doctor = {
-        ...newDoctor,
-        id,
-        avatarUrl: `https://picsum.photos/seed/${id}/100/100`
-      };
-      setDoctors(docs => [doctorToAdd, ...docs]);
+  const handleSaveDoctor = async () => {
+    try {
+      let response;
+      if (editingDoctor) {
+        // Update doctor
+        response = await fetch(`/api/doctors/${editingDoctor.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newDoctor),
+        });
+      } else {
+        // Add new doctor
+        response = await fetch('/api/doctors', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newDoctor),
+        });
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Gagal menyimpan data dokter.');
+      }
+      
+      toast({
+        title: "Sukses",
+        description: `Data dokter berhasil ${editingDoctor ? 'diperbarui' : 'ditambahkan'}.`,
+      });
+      fetchDoctors(); // Refresh data
+      closeDialog();
+
+    } catch (error) {
+        toast({
+            title: "Error",
+            description: error instanceof Error ? error.message : "Terjadi kesalahan",
+            variant: "destructive",
+        });
     }
-    closeDialog();
   };
 
-  const handleDeleteDoctor = (id: string) => {
-    setDoctors(docs => docs.filter(d => d.id !== id));
+  const handleDeleteDoctor = async (id: string) => {
+    if (!confirm('Apakah Anda yakin ingin menghapus dokter ini?')) return;
+
+    try {
+      const response = await fetch(`/api/doctors/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Gagal menghapus dokter.');
+      }
+
+      toast({
+        title: "Sukses",
+        description: "Dokter berhasil dihapus.",
+      });
+      fetchDoctors(); // Refresh data
+
+    } catch (error) {
+       toast({
+            title: "Error",
+            description: error instanceof Error ? error.message : "Gagal menghapus dokter.",
+            variant: "destructive",
+        });
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,39 +159,45 @@ export default function DoctorManagement() {
         </Button>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nama Dokter</TableHead>
-              <TableHead>Spesialisasi (Klinik)</TableHead>
-              <TableHead className="text-right">Tindakan</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {doctors.map(doctor => (
-              <TableRow key={doctor.id}>
-                <TableCell className="font-medium">{doctor.name}</TableCell>
-                <TableCell>{doctor.specialty}</TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Buka menu</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => openEditDialog(doctor)}>Edit</DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive hover:text-destructive" onClick={() => handleDeleteDoctor(doctor.id)}>
-                        Hapus
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        {isLoading ? (
+            <div className="flex justify-center items-center h-40">
+                <Loader2 className="animate-spin" />
+            </div>
+        ) : (
+            <Table>
+            <TableHeader>
+                <TableRow>
+                <TableHead>Nama Dokter</TableHead>
+                <TableHead>Spesialisasi (Klinik)</TableHead>
+                <TableHead className="text-right">Tindakan</TableHead>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                {doctors.map(doctor => (
+                <TableRow key={doctor.id}>
+                    <TableCell className="font-medium">{doctor.name}</TableCell>
+                    <TableCell>{doctor.specialty}</TableCell>
+                    <TableCell className="text-right">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Buka menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => openEditDialog(doctor)}>Edit</DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => handleDeleteDoctor(doctor.id)}>
+                            Hapus
+                        </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    </TableCell>
+                </TableRow>
+                ))}
+            </TableBody>
+            </Table>
+        )}
       </CardContent>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
