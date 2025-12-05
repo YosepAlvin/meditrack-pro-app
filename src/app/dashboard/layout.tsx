@@ -19,6 +19,7 @@ import {
   SidebarInset,
 } from '@/components/ui/sidebar';
 import Header from "@/components/header";
+import ActiveLink from "@/components/active-link";
 
 export default function DashboardLayout({
   children,
@@ -39,44 +40,34 @@ export default function DashboardLayout({
         <SidebarContent>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton href="/dashboard" asChild isActive>
-                <Link href="/dashboard">
-                  <LayoutDashboard />
-                  Dasbor
-                </Link>
-              </SidebarMenuButton>
+                <ActiveLink href="/dashboard">
+                    <LayoutDashboard />
+                    Dasbor
+                </ActiveLink>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton href="#" asChild>
-                <Link href="#">
-                  <CalendarDays />
-                  Janji Temu
-                </Link>
-              </SidebarMenuButton>
+                <ActiveLink href="/dashboard/janji-temu">
+                    <CalendarDays />
+                    Janji Temu
+                </ActiveLink>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton href="#" asChild>
-                <Link href="#">
-                  <Users />
-                  Pasien
-                </Link>
-              </SidebarMenuButton>
+                <ActiveLink href="/dashboard/pasien">
+                    <Users />
+                    Pasien
+                </ActiveLink>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton href="#" asChild>
-                <Link href="#">
-                  <Pill />
-                  Obat
-                </Link>
-              </SidebarMenuButton>
+                <ActiveLink href="/dashboard/obat">
+                    <Pill />
+                    Obat
+                </ActiveLink>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton href="#" asChild>
-                <Link href="#">
-                  <BrainCircuit />
-                  Dosis AI
-                </Link>
-              </SidebarMenuButton>
+                <ActiveLink href="/dashboard/dosis-ai">
+                    <BrainCircuit />
+                    Dosis AI
+                </ActiveLink>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
