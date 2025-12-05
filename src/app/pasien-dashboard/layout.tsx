@@ -53,7 +53,7 @@ export default function PasienDashboardLayout({
                 <ActiveLink href="/pasien-dashboard/riwayat-medis">
                     <ScrollText />
                     Riwayat Medis
-                </AgedLink>
+                </ActiveLink>
             </SidebarMenuItem>
              <SidebarMenuItem>
                 <ActiveLink href="/pasien-dashboard/kesehatan">
