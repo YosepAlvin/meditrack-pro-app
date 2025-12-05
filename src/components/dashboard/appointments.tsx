@@ -60,7 +60,7 @@ export default function Appointments() {
   const doctorId = searchParams.get('doctor');
   
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [medications, setMedications] = useState<Medication[]>(allMedications);
+  const [medications, setMedications] = useState<Medication[]>(() => JSON.parse(JSON.stringify(allMedications)));
   const [isLoading, setIsLoading] = useState(true);
   const [isPrescriptionDialogOpen, setIsPrescriptionDialogOpen] = useState(false);
   const [currentPatient, setCurrentPatient] = useState<Appointment | null>(null);
@@ -69,12 +69,12 @@ export default function Appointments() {
   
   useEffect(() => {
     setIsLoading(true);
-    // Simulasikan pengambilan data dari API dengan membuat salinan data yang dalam
+    // Deep copy data to prevent state mutation issues
+    const allData = JSON.parse(JSON.stringify(allMockAppointments));
     const filteredAppointments = doctorId 
-      ? allMockAppointments.filter(app => app.doctorId === doctorId)
-      : allMockAppointments;
-    // Gunakan JSON.parse(JSON.stringify(...)) untuk membuat salinan yang benar-benar baru
-    setAppointments(JSON.parse(JSON.stringify(filteredAppointments)));
+      ? allData.filter((app: Appointment) => app.doctorId === doctorId)
+      : allData;
+    setAppointments(filteredAppointments);
     setIsLoading(false);
   }, [doctorId]);
 
@@ -98,7 +98,7 @@ export default function Appointments() {
   }
 
   const handlePrescribe = () => {
-    // 1. Validasi
+    // 1. Validate
     if (!currentPatient || !selectedMedicationId) return;
     const medication = medications.find(m => m.id === selectedMedicationId);
     if (!medication) {
@@ -110,10 +110,10 @@ export default function Appointments() {
         return;
     }
 
-    // 2. Tutup dialog terlebih dahulu
+    // 2. Close the dialog first to prevent UI freeze
     setIsPrescriptionDialogOpen(false);
 
-    // 3. Update state obat
+    // 3. Update medication state using functional update
     setMedications(prevMeds =>
         prevMeds.map(m =>
             m.id === selectedMedicationId
@@ -122,7 +122,7 @@ export default function Appointments() {
         )
     );
 
-    // 4. Update state janji temu
+    // 4. Update appointment state using functional update
     setAppointments(prevApps =>
         prevApps.map(app =>
             app.id === currentPatient.id
@@ -131,13 +131,13 @@ export default function Appointments() {
         )
     );
     
-    // 5. Tampilkan notifikasi
+    // 5. Show notification after state updates are queued
     toast({
         title: "Resep Diberikan!",
         description: `${prescriptionQuantity} unit ${medication.name} diresepkan untuk ${currentPatient.patientName}.`,
     });
 
-    // 6. Reset state dialog
+    // 6. Reset dialog state
     setCurrentPatient(null);
     setSelectedMedicationId(null);
     setPrescriptionQuantity(1);
