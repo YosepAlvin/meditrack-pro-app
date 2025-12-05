@@ -87,3 +87,20 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Fix for react-day-picker */
+.rdp {
+    --rdp-cell-size: 2.5rem; /* 40px */
+    --rdp-caption-font-size: 1rem;
+    --rdp-day-font-size: 0.875rem;
+}
+
+.rdp-day_today:not(.rdp-day_outside) {
+  @apply bg-accent text-accent-foreground;
+}
+
+@media (max-width: 768px) {
+    .rdp {
+        --rdp-cell-size: 2.25rem; /* 36px */
+    }
+}
