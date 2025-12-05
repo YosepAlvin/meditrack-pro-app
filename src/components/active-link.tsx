@@ -8,10 +8,16 @@ export default function ActiveLink({ href, children }: { href: string, children:
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const doctor = searchParams.get('doctor');
+    const patient = searchParams.get('patient');
 
     const isActive = pathname === href;
     
-    const finalHref = doctor ? `${href}?doctor=${doctor}` : href;
+    let finalHref = href;
+    if (doctor) {
+        finalHref = `${href}?doctor=${doctor}`;
+    } else if (patient) {
+        finalHref = `${href}?patient=${patient}`;
+    }
 
     return (
         <SidebarMenuButton href={finalHref} asChild isActive={isActive}>

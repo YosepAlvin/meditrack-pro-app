@@ -52,8 +52,14 @@ export function LoginForm() {
          <Button className="w-full" asChild>
           <Link href="/dashboard?doctor=dr-gunawan">Dokter Gunawan</Link>
         </Button>
+        <div className="relative w-full">
+            <Separator className="my-2" />
+        </div>
         <Button variant="outline" className="w-full" asChild>
-          <Link href="/pasien-dashboard">Pasien</Link>
+          <Link href="/pasien-dashboard?patient=1">Pasien Budi Sanjoyo</Link>
+        </Button>
+        <Button variant="outline" className="w-full" asChild>
+          <Link href="/pasien-dashboard?patient=2">Pasien Siti Aminah</Link>
         </Button>
       </CardFooter>
     </Card>

@@ -14,33 +14,35 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { LogOut, User } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { doctors, patients } from '@/lib/data';
 
 export default function ClientHeader({ title: defaultTitle }: { title: string }) {
   const searchParams = useSearchParams();
-  const doctor = searchParams.get('doctor');
+  const doctorId = searchParams.get('doctor');
+  const patientId = searchParams.get('patient');
 
-  const getDoctorName = () => {
-    if (doctor === 'dr-wahyu') return 'Dr. Wahyu';
-    if (doctor === 'dr-indah') return 'Dr. Indah';
-    if (doctor === 'dr-gunawan') return 'Dr. Gunawan';
-    return defaultTitle;
-  }
-  
-  const getAvatarFallback = () => {
-    if (doctor === 'dr-wahyu') return 'DW';
-    if (doctor === 'dr-indah') return 'DI';
-    if (doctor === 'dr-gunawan') return 'DG';
-    return 'AD';
+  let title = defaultTitle;
+  let avatarUrl = 'https://picsum.photos/seed/100/40/40';
+  let avatarFallback = 'AD';
+
+  if (doctorId) {
+    const doctor = doctors.find(d => d.id === doctorId);
+    if (doctor) {
+        title = doctor.name;
+        avatarUrl = doctor.avatarUrl;
+        avatarFallback = doctor.name.substring(0, 2).toUpperCase();
+    }
+  } else if (patientId) {
+    const patient = patients.find(p => p.id === patientId);
+    if (patient) {
+        title = patient.name;
+        avatarUrl = patient.avatarUrl;
+        avatarFallback = patient.name.substring(0, 2).toUpperCase();
+    } else {
+        title = "Dasbor Pasien"
+    }
   }
 
-  const getAvatarUrl = () => {
-    if (doctor === 'dr-wahyu') return 'https://picsum.photos/seed/101/40/40';
-    if (doctor === 'dr-indah') return 'https://picsum.photos/seed/102/40/40';
-    if (doctor === 'dr-gunawan') return 'https://picsum.photos/seed/103/40/40';
-    return 'https://picsum.photos/seed/100/40/40';
-  }
-
-  const title = getDoctorName();
 
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 md:px-6">
@@ -53,8 +55,8 @@ export default function ClientHeader({ title: defaultTitle }: { title: string })
           <DropdownMenuTrigger asChild>
             <Button variant="secondary" size="icon" className="rounded-full">
               <Avatar>
-                <AvatarImage src={getAvatarUrl()} alt="Avatar pengguna" data-ai-hint="person portrait" />
-                <AvatarFallback>{getAvatarFallback()}</AvatarFallback>
+                <AvatarImage src={avatarUrl} alt="Avatar pengguna" data-ai-hint="person portrait" />
+                <AvatarFallback>{avatarFallback}</AvatarFallback>
               </Avatar>
               <span className="sr-only">Buka menu pengguna</span>
             </Button>

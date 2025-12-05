@@ -16,16 +16,13 @@ import {
   SidebarFooter,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import Header from "@/components/header";
 import ActiveLink from "@/components/active-link";
+import ClientHeader from "@/components/client-header";
+import { Suspense } from "react";
 
-export default function PasienDashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function PasienDashboardContent({ children }: { children: React.ReactNode }) {
   return (
-    <SidebarProvider>
+      <SidebarProvider>
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center gap-2 p-2">
@@ -66,9 +63,21 @@ export default function PasienDashboardLayout({
         <SidebarFooter/>
       </Sidebar>
       <SidebarInset>
-        <Header title="Dasbor Pasien" />
+        <ClientHeader title="Dasbor Pasien" />
         {children}
       </SidebarInset>
     </SidebarProvider>
+  )
+}
+
+export default function PasienDashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <Suspense>
+      <PasienDashboardContent>{children}</PasienDashboardContent>
+    </Suspense>
   );
 }
