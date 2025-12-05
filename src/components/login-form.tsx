@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
@@ -15,7 +16,31 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 
+type NewUser = {
+  id: string;
+  name: string;
+  role: 'dokter' | 'pasien';
+  specialty?: string;
+};
+
 export function LoginForm() {
+  const [newUsers, setNewUsers] = useState<NewUser[]>([]);
+
+  useEffect(() => {
+    // Client-side only: access localStorage
+    const storedUsers = localStorage.getItem('newUsers');
+    if (storedUsers) {
+      setNewUsers(JSON.parse(storedUsers));
+    }
+  }, []);
+
+  const createLoginLink = (user: NewUser) => {
+    if (user.role === 'dokter') {
+      return `/dashboard?doctor=${user.id}&name=${encodeURIComponent(user.name)}&specialty=${encodeURIComponent(user.specialty || 'Spesialis Umum')}`;
+    }
+    return `/pasien-dashboard?patient=${user.id}&name=${encodeURIComponent(user.name)}`;
+  };
+
   return (
     <Card className="border-0 shadow-none">
       <CardHeader className="space-y-1 text-left p-0 pb-4 pt-4">
@@ -61,6 +86,17 @@ export function LoginForm() {
         <Button variant="outline" className="w-full" asChild>
           <Link href="/pasien-dashboard?patient=2&name=Siti%20Aminah">Pasien Siti Aminah</Link>
         </Button>
+        
+        {/* Render buttons for dynamically created users */}
+        {newUsers.length > 0 && <Separator className="my-2" />}
+        {newUsers.map(user => (
+           <Button key={user.id} variant={user.role === 'dokter' ? 'default' : 'outline'} className="w-full" asChild>
+             <Link href={createLoginLink(user)}>
+                {user.role === 'dokter' ? `Dokter ${user.name}` : `Pasien ${user.name}`}
+             </Link>
+           </Button>
+        ))}
+
       </CardFooter>
     </Card>
   );

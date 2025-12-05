@@ -18,9 +18,17 @@ import { useState } from 'react';
 
 const createIdFromName = (name: string, role: string) => {
     const prefix = role === 'dokter' ? 'dr' : 'pat';
-    const sanitizedName = name.toLowerCase().replace(/[^a-z0-9]/g, '-');
+    const sanitizedName = name.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
     return `${prefix}-${sanitizedName}`;
 }
+
+type NewUser = {
+  id: string;
+  name: string;
+  role: 'dokter' | 'pasien';
+  specialty?: string;
+};
+
 
 export function RegisterForm() {
     const [role, setRole] = useState('pasien');
@@ -35,15 +43,33 @@ export function RegisterForm() {
 
         const newId = createIdFromName(fullName, role);
         let path = '';
+        const specialty = "Spesialis Umum";
+
+        const newUser: NewUser = {
+            id: newId,
+            name: fullName,
+            role: role as 'dokter' | 'pasien',
+        };
 
         if (role === 'pasien') {
             path = `/pasien-dashboard?patient=${newId}&name=${encodeURIComponent(fullName)}`;
         } else if (role === 'dokter') {
-            // Untuk dokter, kita butuh spesialisasi. Mari kita buat default.
-            const specialty = "Spesialis Umum";
+            newUser.specialty = specialty;
             path = `/dashboard?doctor=${newId}&name=${encodeURIComponent(fullName)}&specialty=${encodeURIComponent(specialty)}`;
         } else {
-            path = '/admin-dashboard';
+            // For admin, no user is created, just redirect
+            router.push('/admin-dashboard');
+            return;
+        }
+
+        // Save new user to localStorage
+        const storedUsers = localStorage.getItem('newUsers');
+        const users: NewUser[] = storedUsers ? JSON.parse(storedUsers) : [];
+        
+        // Avoid adding duplicates
+        if (!users.find(u => u.id === newId)) {
+            users.push(newUser);
+            localStorage.setItem('newUsers', JSON.stringify(users));
         }
 
         router.push(path);
