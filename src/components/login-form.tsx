@@ -44,22 +44,22 @@ export function LoginForm() {
           <Link href="/admin-dashboard">Admin</Link>
         </Button>
         <Button className="w-full" asChild>
-          <Link href="/dashboard?doctor=dr-wahyu">Dokter Wahyu</Link>
+          <Link href="/dashboard?doctor=dr-wahyu&name=Dr.%20Wahyu&specialty=Spesialis%20Kardiologi">Dokter Wahyu</Link>
         </Button>
          <Button className="w-full" asChild>
-          <Link href="/dashboard?doctor=dr-indah">Dokter Indah</Link>
+          <Link href="/dashboard?doctor=dr-indah&name=Dr.%20Indah&specialty=Spesialis%20Neurologi">Dokter Indah</Link>
         </Button>
          <Button className="w-full" asChild>
-          <Link href="/dashboard?doctor=dr-gunawan">Dokter Gunawan</Link>
+          <Link href="/dashboard?doctor=dr-gunawan&name=Dr.%20Gunawan&specialty=Spesialis%20Pediatri">Dokter Gunawan</Link>
         </Button>
         <div className="relative w-full">
             <Separator className="my-2" />
         </div>
         <Button variant="outline" className="w-full" asChild>
-          <Link href="/pasien-dashboard?patient=1">Pasien Budi Sanjoyo</Link>
+          <Link href="/pasien-dashboard?patient=1&name=Budi%20Sanjoyo">Pasien Budi Sanjoyo</Link>
         </Button>
         <Button variant="outline" className="w-full" asChild>
-          <Link href="/pasien-dashboard?patient=2">Pasien Siti Aminah</Link>
+          <Link href="/pasien-dashboard?patient=2&name=Siti%20Aminah">Pasien Siti Aminah</Link>
         </Button>
       </CardFooter>
     </Card>

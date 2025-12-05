@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useSearchParams } from "next/navigation";
@@ -7,11 +6,33 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, UserCheck } from "lucide-react";
 import { doctors } from "@/lib/data";
+import type { Doctor } from "@/lib/types";
+
+const getDoctor = (searchParams: URLSearchParams): Doctor | null => {
+    const doctorId = searchParams.get('doctor');
+    if (!doctorId) return doctors[0]; // fallback ke dokter pertama
+
+    const existingDoctor = doctors.find(d => d.id === doctorId);
+    if (existingDoctor) return existingDoctor;
+
+    // Jika tidak ada, buat dokter baru dari URL params
+    const name = searchParams.get('name');
+    const specialty = searchParams.get('specialty');
+
+    if (name && specialty) {
+        return {
+            id: doctorId,
+            name: name,
+            specialty: specialty,
+            avatarUrl: `https://picsum.photos/seed/${Buffer.from(name).toString('hex')}/100/100`
+        };
+    }
+    return null;
+}
 
 export default function DoctorProfile() {
     const searchParams = useSearchParams();
-    const doctorId = searchParams.get('doctor') || 'dr-wahyu';
-    const doctor = doctors.find(d => d.id === doctorId);
+    const doctor = getDoctor(searchParams);
 
     if (!doctor) {
         return (

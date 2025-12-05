@@ -15,34 +15,58 @@ import { LogOut, User } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { doctors, patients } from '@/lib/data';
+import type { Doctor, Patient } from '@/lib/types';
+
+const getDynamicUser = (searchParams: URLSearchParams): Doctor | Patient | null => {
+    const doctorId = searchParams.get('doctor');
+    const patientId = searchParams.get('patient');
+    const name = searchParams.get('name');
+
+    if (doctorId && name) {
+        let doctor = doctors.find(d => d.id === doctorId);
+        if (!doctor) {
+            // Buat dokter baru secara dinamis jika tidak ditemukan
+            const specialty = searchParams.get('specialty') || 'Spesialis Umum';
+            doctor = {
+                id: doctorId,
+                name: name,
+                specialty: specialty,
+                avatarUrl: `https://picsum.photos/seed/${Buffer.from(name).toString('hex')}/100/100`
+            };
+        }
+        return doctor;
+    }
+
+    if (patientId && name) {
+        let patient = patients.find(p => p.id === patientId);
+        if (!patient) {
+            // Buat pasien baru secara dinamis jika tidak ditemukan
+            patient = {
+                id: patientId,
+                name: name,
+                email: `${name.split(' ')[0].toLowerCase()}@example.com`,
+                avatarUrl: `https://picsum.photos/seed/${Buffer.from(name).toString('hex')}/40/40`,
+                lastVisit: new Date().toISOString().split('T')[0]
+            };
+        }
+        return patient;
+    }
+    
+    // Fallback untuk user yang sudah ada
+    if (doctorId) return doctors.find(d => d.id === doctorId) || null;
+    if (patientId) return patients.find(p => p.id === patientId) || null;
+
+    return null;
+}
+
 
 export default function ClientHeader({ title: defaultTitle }: { title: string }) {
   const searchParams = useSearchParams();
-  const doctorId = searchParams.get('doctor');
-  const patientId = searchParams.get('patient');
+  const user = getDynamicUser(searchParams);
 
-  let title = defaultTitle;
-  let avatarUrl = 'https://picsum.photos/seed/100/40/40';
-  let avatarFallback = 'AD';
-
-  if (doctorId) {
-    const doctor = doctors.find(d => d.id === doctorId);
-    if (doctor) {
-        title = doctor.name;
-        avatarUrl = doctor.avatarUrl;
-        avatarFallback = doctor.name.substring(0, 2).toUpperCase();
-    }
-  } else if (patientId) {
-    const patient = patients.find(p => p.id === patientId);
-    if (patient) {
-        title = patient.name;
-        avatarUrl = patient.avatarUrl;
-        avatarFallback = patient.name.substring(0, 2).toUpperCase();
-    } else {
-        title = "Dasbor Pasien"
-    }
-  }
-
+  let title = user?.name || defaultTitle;
+  let avatarUrl = user?.avatarUrl || 'https://picsum.photos/seed/100/40/40';
+  let avatarFallback = user?.name ? user.name.substring(0, 2).toUpperCase() : 'AD';
 
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 md:px-6">
