@@ -20,10 +20,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import type { Appointment, Medication } from "@/lib/types"
+import type { Appointment } from "@/lib/types"
 import { MoreHorizontal, PlusCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { medications as allMedications, appointments as allAppointments } from '@/lib/data';
+import { medications as allMedications, appointments as allMockAppointments } from '@/lib/data';
 import Link from 'next/link';
 import { 
   Dialog, 
@@ -59,7 +59,6 @@ export default function Appointments() {
   const searchParams = useSearchParams();
   const doctorId = searchParams.get('doctor');
   
-  // State untuk janji temu, dialog resep, dan data terkait
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isPrescriptionDialogOpen, setIsPrescriptionDialogOpen] = useState(false);
@@ -67,17 +66,16 @@ export default function Appointments() {
   const [selectedMedication, setSelectedMedication] = useState<string>('');
   const [quantity, setQuantity] = useState<number>(1);
   
-  // Mengambil dan memfilter data janji temu
   useEffect(() => {
     setIsLoading(true);
     // Simulasikan pengambilan data dari API
     setTimeout(() => {
       const filteredAppointments = doctorId 
-        ? allAppointments.filter(app => app.doctorId === doctorId)
-        : allAppointments;
+        ? allMockAppointments.filter(app => app.doctorId === doctorId)
+        : allMockAppointments;
       setAppointments(filteredAppointments);
       setIsLoading(false);
-    }, 500); // Penundaan untuk simulasi loading
+    }, 500);
   }, [doctorId]);
 
   const handleUpdateStatus = (appointmentId: number, newStatus: Appointment['status']) => {
@@ -86,13 +84,6 @@ export default function Appointments() {
         app.id === appointmentId ? { ...app, status: newStatus } : app
       )
     );
-
-    // Update data global juga (simulasi update ke database)
-    const globalIndex = allAppointments.findIndex(app => app.id === appointmentId);
-    if (globalIndex !== -1) {
-        allAppointments[globalIndex].status = newStatus;
-    }
-
     toast({
       title: "Status Diperbarui",
       description: `Status janji temu telah diubah menjadi ${newStatus}.`,
@@ -107,6 +98,9 @@ export default function Appointments() {
   };
 
   const handlePrescribe = () => {
+    // Tutup dialog terlebih dahulu untuk mencegah UI freeze
+    setIsPrescriptionDialogOpen(false);
+
     if (!currentPatient || !selectedMedication || quantity <= 0) {
         toast({ title: "Error", description: "Pilih obat dan jumlah yang valid.", variant: "destructive" });
         return;
@@ -122,22 +116,17 @@ export default function Appointments() {
         return;
     }
     
-    setIsPrescriptionDialogOpen(false);
-
-    // Kurangi stok obat
+    // Kurangi stok obat (hanya pada data mock, di aplikasi nyata ini akan jadi panggilan API)
     allMedications[medIndex].stock -= quantity;
 
-    // Perbarui status janji temu menjadi 'Selesai' di state lokal dan global
     const appointmentId = currentPatient.id;
+
+    // Perbarui status janji temu menjadi 'Selesai' di state lokal
     setAppointments(currentAppointments =>
       currentAppointments.map(app =>
         app.id === appointmentId ? { ...app, status: 'Selesai' } : app
       )
     );
-    const globalIndex = allAppointments.findIndex(app => app.id === appointmentId);
-    if (globalIndex !== -1) {
-        allAppointments[globalIndex].status = 'Selesai';
-    }
 
     // Tampilkan satu notifikasi yang benar
     toast({ 
