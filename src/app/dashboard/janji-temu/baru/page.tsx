@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -9,14 +10,45 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
+import { doctors, appointments } from "@/lib/data"; // Import data
 
 export default function BuatJanjiTemuDokterPage() {
     const { toast } = useToast();
+    const [selectedDoctorId, setSelectedDoctorId] = useState<string | null>(null);
+
 
     const handleCreateAppointment = () => {
+        if (!selectedDoctorId) {
+            toast({
+                variant: "destructive",
+                title: "Gagal!",
+                description: "Silakan pilih dokter terlebih dahulu.",
+            });
+            return;
+        }
+
+        const selectedDoctor = doctors.find(d => d.id === selectedDoctorId);
+        if (!selectedDoctor) return;
+
+        // Buat janji temu baru
+        const newAppointment = {
+            id: appointments.length + 200, // ID sementara yang unik
+            patientName: "Pasien Baru", // Hardcoded untuk demo
+            doctorName: selectedDoctor.name,
+            doctorId: selectedDoctor.id,
+            clinic: selectedDoctor.specialty,
+            time: "16:00", // Waktu default
+            status: "Terkonfirmasi" as const,
+            complaint: "Didaftarkan oleh Staf",
+            appointment_date: new Date().toISOString().slice(0, 10),
+        };
+
+        // Tambahkan janji temu baru ke array
+        appointments.unshift(newAppointment);
+
         toast({
             title: "Janji Temu Dibuat!",
-            description: "Janji temu baru telah berhasil ditambahkan ke sistem.",
+            description: `Janji temu baru untuk ${selectedDoctor.name} telah ditambahkan.`,
         });
     }
 
@@ -51,14 +83,16 @@ export default function BuatJanjiTemuDokterPage() {
                             </div>
                              <div className="space-y-2">
                                 <Label>Pilih Dokter</Label>
-                                <Select>
+                                <Select onValueChange={setSelectedDoctorId}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Pilih dokter yang tersedia" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="dr-wahyu">Dr. Wahyu</SelectItem>
-                                        <SelectItem value="dr-indah">Dr. Indah</SelectItem>
-                                        <SelectItem value="dr-gunawan">Dr. Gunawan</SelectItem>
+                                        {doctors.map(doctor => (
+                                            <SelectItem key={doctor.id} value={doctor.id}>
+                                                {doctor.name} - {doctor.specialty}
+                                            </SelectItem>
+                                        ))}
                                     </SelectContent>
                                 </Select>
                             </div>
