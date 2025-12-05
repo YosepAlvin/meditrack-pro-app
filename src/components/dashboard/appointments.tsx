@@ -20,7 +20,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import type { Appointment } from "@/lib/types"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import type { Appointment, Medication } from "@/lib/types"
 import { MoreHorizontal, PlusCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { medications as allMedications, appointments as allMockAppointments } from '@/lib/data';
@@ -49,7 +61,12 @@ export default function Appointments() {
   const doctorId = searchParams.get('doctor');
   
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [medications, setMedications] = useState<Medication[]>(allMedications);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPrescriptionDialogOpen, setIsPrescriptionDialogOpen] = useState(false);
+  const [currentPatient, setCurrentPatient] = useState<Appointment | null>(null);
+  const [selectedMedicationId, setSelectedMedicationId] = useState<string | null>(null);
+  const [prescriptionQuantity, setPrescriptionQuantity] = useState(1);
   
   useEffect(() => {
     setIsLoading(true);
@@ -75,21 +92,62 @@ export default function Appointments() {
     });
   };
 
-  // FUNGSI DISEDERHANAKAN UNTUK DEBUGGING
-  const handlePrescribeAndFinish = (appointmentId: number) => {
-    setAppointments(currentAppointments =>
-      currentAppointments.map(app =>
-        app.id === appointmentId ? { ...app, status: 'Selesai' } : app
-      )
+  const openPrescriptionDialog = (appointment: Appointment) => {
+    setCurrentPatient(appointment);
+    setSelectedMedicationId(null);
+    setPrescriptionQuantity(1);
+    setIsPrescriptionDialogOpen(true);
+  }
+
+  const handlePrescribe = () => {
+    if (!currentPatient || !selectedMedicationId) return;
+
+    const medication = medications.find(m => m.id === selectedMedicationId);
+    if (!medication) {
+        toast({ title: "Error", description: "Obat tidak ditemukan.", variant: "destructive" });
+        return;
+    }
+
+    if (medication.stock < prescriptionQuantity) {
+        toast({ title: "Stok Habis!", description: `Stok ${medication.name} tidak mencukupi.`, variant: "destructive" });
+        return;
+    }
+
+    // Tutup dialog dulu
+    setIsPrescriptionDialogOpen(false);
+    
+    // Update state obat
+    setMedications(prevMeds =>
+        prevMeds.map(m =>
+            m.id === selectedMedicationId
+                ? { ...m, stock: m.stock - prescriptionQuantity }
+                : m
+        )
     );
+
+    // Update state janji temu
+    setAppointments(prevApps =>
+        prevApps.map(app =>
+            app.id === currentPatient.id
+                ? { ...app, status: 'Selesai' }
+                : app
+        )
+    );
+    
     toast({
-      title: "Pemeriksaan Selesai",
-      description: `Janji temu telah diselesaikan.`,
+        title: "Resep Diberikan!",
+        description: `${prescriptionQuantity} unit ${medication.name} diresepkan untuk ${currentPatient.patientName}.`,
     });
+
+    // Reset state dialog
+    setCurrentPatient(null);
+    setSelectedMedicationId(null);
+    setPrescriptionQuantity(1);
   };
 
 
   return (
+    <>
     <Card className="shadow-md">
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
@@ -146,10 +204,10 @@ export default function Appointments() {
                                 Panggil Pasien
                             </DropdownMenuItem>
                             <DropdownMenuItem 
-                                onClick={() => handlePrescribeAndFinish(appointment.id)}
+                                onClick={() => openPrescriptionDialog(appointment)}
                                 disabled={appointment.status !== 'Dipanggil'}
                             >
-                                Selesaikan Pemeriksaan
+                                Resepkan &amp; Selesaikan
                             </DropdownMenuItem>
                             <DropdownMenuItem 
                                 onClick={() => handleUpdateStatus(appointment.id, 'Terkonfirmasi')}
@@ -180,5 +238,52 @@ export default function Appointments() {
         )}
       </CardContent>
     </Card>
+
+    <Dialog open={isPrescriptionDialogOpen} onOpenChange={setIsPrescriptionDialogOpen}>
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Tulis Resep untuk {currentPatient?.patientName}</DialogTitle>
+                <DialogDescription>Pilih obat dan tentukan jumlahnya. Stok akan berkurang secara otomatis.</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                    <Label>Obat</Label>
+                    <Select onValueChange={setSelectedMedicationId} defaultValue={selectedMedicationId || undefined}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Pilih obat..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {medications.map(med => (
+                                <SelectItem key={med.id} value={med.id} disabled={med.stock === 0}>
+                                    {med.name} ({med.strength}) - Stok: {med.stock}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="quantity">Jumlah</Label>
+                    <Input 
+                        id="quantity" 
+                        type="number" 
+                        min="1" 
+                        value={prescriptionQuantity} 
+                        onChange={(e) => setPrescriptionQuantity(Number(e.target.value))} 
+                    />
+                </div>
+            </div>
+            <DialogFooter>
+                <DialogClose asChild>
+                    <Button variant="outline">Batal</Button>
+                </DialogClose>
+                <Button onClick={handlePrescribe} disabled={!selectedMedicationId || prescriptionQuantity <= 0}>
+                    Resepkan &amp; Selesaikan
+                </Button>
+            </DialogFooter>
+        </DialogContent>
+    </Dialog>
+    </>
   )
 }
+
+    
