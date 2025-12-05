@@ -7,24 +7,29 @@ import { SidebarMenuButton } from "@/components/ui/sidebar";
 export default function ActiveLink({ href, children }: { href: string, children: React.ReactNode }) {
     const pathname = usePathname();
     const searchParams = useSearchParams();
-    const doctor = searchParams.get('doctor');
-    const patient = searchParams.get('patient');
-
-    // Cek apakah link saat ini adalah link admin dashboard
-    const isAdminRoute = href.startsWith('/admin-dashboard');
-    const isActive = pathname === href;
     
+    const isActive = pathname === href;
+
+    // Tentukan konteks saat ini berdasarkan URL
+    const isAdminDashboard = pathname.startsWith('/admin-dashboard');
+    const isDoctorDashboard = pathname.startsWith('/dashboard');
+    const isPatientDashboard = pathname.startsWith('/pasien-dashboard');
+
     let finalHref = href;
 
-    // Hanya tambahkan query params jika BUKAN route admin
-    if (!isAdminRoute) {
+    // Tambahkan query params hanya jika kita berada di dashboard yang relevan
+    if (isDoctorDashboard) {
+        const doctor = searchParams.get('doctor');
         if (doctor) {
             finalHref = `${href}?doctor=${doctor}`;
-        } else if (patient) {
+        }
+    } else if (isPatientDashboard) {
+        const patient = searchParams.get('patient');
+        if (patient) {
             finalHref = `${href}?patient=${patient}`;
         }
     }
-
+    // Jika kita di admin dashboard (isAdminDashboard), finalHref akan tetap menjadi href asli tanpa query param tambahan.
 
     return (
         <SidebarMenuButton href={finalHref} asChild isActive={isActive}>
