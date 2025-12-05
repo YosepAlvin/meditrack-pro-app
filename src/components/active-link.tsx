@@ -10,14 +10,21 @@ export default function ActiveLink({ href, children }: { href: string, children:
     const doctor = searchParams.get('doctor');
     const patient = searchParams.get('patient');
 
+    // Cek apakah link saat ini adalah link admin dashboard
+    const isAdminRoute = href.startsWith('/admin-dashboard');
     const isActive = pathname === href;
     
     let finalHref = href;
-    if (doctor) {
-        finalHref = `${href}?doctor=${doctor}`;
-    } else if (patient) {
-        finalHref = `${href}?patient=${patient}`;
+
+    // Hanya tambahkan query params jika BUKAN route admin
+    if (!isAdminRoute) {
+        if (doctor) {
+            finalHref = `${href}?doctor=${doctor}`;
+        } else if (patient) {
+            finalHref = `${href}?patient=${patient}`;
+        }
     }
+
 
     return (
         <SidebarMenuButton href={finalHref} asChild isActive={isActive}>
