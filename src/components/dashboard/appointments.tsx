@@ -35,7 +35,6 @@ import { Label } from "@/components/ui/label";
 import type { Appointment, Medication } from "@/lib/types"
 import { MoreHorizontal, PlusCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { medications as allMedications, appointments as allMockAppointments } from '@/lib/data';
 import Link from 'next/link';
 
 const statusVariant = (status: Appointment['status']) => {
@@ -55,13 +54,18 @@ const statusVariant = (status: Appointment['status']) => {
   }
 }
 
-export default function Appointments() {
+type AppointmentsProps = {
+    appointments: Appointment[];
+    medications: Medication[];
+    onUpdateStatus: (appointmentId: number, newStatus: Appointment['status']) => void;
+    onPrescribe: (appointmentId: number, medicationId: string, quantity: number) => void;
+}
+
+export default function Appointments({ appointments, medications, onUpdateStatus, onPrescribe }: AppointmentsProps) {
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const doctorId = searchParams.get('doctor');
   
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [medications, setMedications] = useState<Medication[]>(() => JSON.parse(JSON.stringify(allMedications)));
   const [isLoading, setIsLoading] = useState(true);
   const [isPrescriptionDialogOpen, setIsPrescriptionDialogOpen] = useState(false);
   const [currentPatient, setCurrentPatient] = useState<Appointment | null>(null);
@@ -69,22 +73,12 @@ export default function Appointments() {
   const [prescriptionQuantity, setPrescriptionQuantity] = useState(1);
   
   useEffect(() => {
-    setIsLoading(true);
-    // Deep copy data to prevent state mutation issues
-    const allData = JSON.parse(JSON.stringify(allMockAppointments));
-    const filteredAppointments = doctorId 
-      ? allData.filter((app: Appointment) => app.doctorId === doctorId)
-      : allData;
-    setAppointments(filteredAppointments);
-    setIsLoading(false);
-  }, [doctorId]);
+    // Loading is now managed by the parent, but we can keep this for visual feedback if needed
+    setIsLoading(appointments.length === 0 && !doctorId);
+  }, [appointments, doctorId]);
 
   const handleUpdateStatus = (appointmentId: number, newStatus: Appointment['status']) => {
-    setAppointments(currentAppointments =>
-      currentAppointments.map(app =>
-        app.id === appointmentId ? { ...app, status: newStatus } : app
-      )
-    );
+    onUpdateStatus(appointmentId, newStatus);
     toast({
       title: "Status Diperbarui",
       description: `Status janji temu telah diubah menjadi ${newStatus}.`,
@@ -99,11 +93,12 @@ export default function Appointments() {
   }
 
   const handlePrescribe = () => {
-    // 1. Close the dialog first to prevent UI freeze
+    // 1. Close the dialog first to prevent any UI lock
     setIsPrescriptionDialogOpen(false);
 
     // 2. Validate
     if (!currentPatient || !selectedMedicationId) return;
+    
     const medication = medications.find(m => m.id === selectedMedicationId);
     if (!medication) {
         toast({ title: "Error", description: "Obat tidak ditemukan.", variant: "destructive" });
@@ -114,31 +109,16 @@ export default function Appointments() {
         return;
     }
 
-    // 3. Update medication state using functional update
-    setMedications(prevMeds =>
-        prevMeds.map(m =>
-            m.id === selectedMedicationId
-                ? { ...m, stock: m.stock - prescriptionQuantity }
-                : m
-        )
-    );
-
-    // 4. Update appointment state using functional update
-    setAppointments(prevApps =>
-        prevApps.map(app =>
-            app.id === currentPatient.id
-                ? { ...app, status: 'Selesai' }
-                : app
-        )
-    );
+    // 3. Call parent function to update state
+    onPrescribe(currentPatient.id, selectedMedicationId, prescriptionQuantity);
     
-    // 5. Show notification after state updates are queued
+    // 4. Show notification after state updates are queued
     toast({
         title: "Resep Diberikan!",
-        description: `${prescriptionQuantity} unit ${medication.name} diresepkan untuk ${currentPatient.patientName}.`,
+        description: `${prescriptionQuantity} unit ${medication.name} diresepkan untuk ${currentPatient.patientName}. Status pasien: Selesai.`,
     });
 
-    // 6. Reset dialog state
+    // 5. Reset dialog state
     setCurrentPatient(null);
     setSelectedMedicationId(null);
     setPrescriptionQuantity(1);

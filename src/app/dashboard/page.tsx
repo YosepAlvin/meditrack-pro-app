@@ -1,10 +1,10 @@
 
 "use client";
 
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
   Activity,
-  PlusCircle,
   BookUser,
   CalendarClock,
   ClipboardPlus,
@@ -17,8 +17,10 @@ import DoctorProfile from '@/components/dashboard/doctor/doctor-profile';
 import PracticeSchedule from '@/components/dashboard/doctor/practice-schedule';
 import RecentMedicalRecords from '@/components/dashboard/doctor/recent-medical-records';
 import Link from 'next/link';
-import { doctors, appointments } from '@/lib/data';
+import { doctors, appointments as mockAppointments, medications as mockMedications } from '@/lib/data';
+import type { Appointment, Medication } from '@/lib/types';
 import Appointments from '@/components/dashboard/appointments';
+import MedicationStock from '@/components/dashboard/medication-stock';
 
 
 function QuickActions() {
@@ -65,8 +67,8 @@ function MiniAnalytics() {
     const doctorId = searchParams.get('doctor') || 'dr-wahyu';
     const doctor = doctors.find(d => d.id === doctorId);
 
-    const patientCount = appointments.filter(a => a.doctorName === doctor?.name).length;
-    const completedPatientCount = appointments.filter(a => a.doctorName === doctor?.name && a.status === 'Selesai').length;
+    const patientCount = mockAppointments.filter(a => a.doctorName === doctor?.name).length;
+    const completedPatientCount = mockAppointments.filter(a => a.doctorName === doctor?.name && a.status === 'Selesai').length;
 
 
     return (
@@ -96,13 +98,62 @@ function MiniAnalytics() {
 }
 
 export default function DashboardPage() {
+  const searchParams = useSearchParams();
+  const doctorId = searchParams.get('doctor');
+
+  // Lifted state
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [medications, setMedications] = useState<Medication[]>([]);
+
+  // Initialize state from mock data
+  useEffect(() => {
+    // Deep copy to prevent direct mutation
+    const allData = JSON.parse(JSON.stringify(mockAppointments));
+    const filteredAppointments = doctorId 
+      ? allData.filter((app: Appointment) => app.doctorId === doctorId)
+      : allData;
+    setAppointments(filteredAppointments);
+    setMedications(JSON.parse(JSON.stringify(mockMedications)));
+  }, [doctorId]);
+
+
+  const handleUpdateAppointmentStatus = (appointmentId: number, newStatus: Appointment['status']) => {
+    setAppointments(prevApps =>
+      prevApps.map(app =>
+        app.id === appointmentId ? { ...app, status: newStatus } : app
+      )
+    );
+  };
+
+  const handlePrescribeAndUpdate = (appointmentId: number, medicationId: string, quantity: number) => {
+    // Update medication stock
+    setMedications(prevMeds =>
+      prevMeds.map(med =>
+        med.id === medicationId ? { ...med, stock: med.stock - quantity } : med
+      )
+    );
+
+    // Update appointment status
+    setAppointments(prevApps =>
+      prevApps.map(app =>
+        app.id === appointmentId ? { ...app, status: 'Selesai' } : app
+      )
+    );
+  };
+
+
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
       <div className="grid gap-4 md:gap-8 lg:grid-cols-3">
         {/* Kolom Kiri */}
         <div className="lg:col-span-2 space-y-4">
           <PracticeSchedule />
-          <Appointments />
+          <Appointments 
+             appointments={appointments}
+             medications={medications}
+             onUpdateStatus={handleUpdateAppointmentStatus}
+             onPrescribe={handlePrescribeAndUpdate}
+          />
         </div>
         {/* Kolom Kanan */}
         <div className="space-y-4">
