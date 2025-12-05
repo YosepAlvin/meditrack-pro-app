@@ -51,7 +51,7 @@ export function RegisterForm() {
 
   return (
     <Card className="border-0 shadow-none">
-      <CardHeader className="space-y-1 text-left p-0 pb-4">
+      <CardHeader className="space-y-1 text-left p-0 pb-4 pt-4">
         <CardTitle className="text-2xl font-headline">Buat sebuah akun</CardTitle>
         <CardDescription>
           Masukkan informasi Anda dan pilih peran Anda.

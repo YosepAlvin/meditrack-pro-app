@@ -18,7 +18,7 @@ import { Separator } from '@/components/ui/separator';
 export function LoginForm() {
   return (
     <Card className="border-0 shadow-none">
-      <CardHeader className="space-y-1 text-left p-0 pb-4">
+      <CardHeader className="space-y-1 text-left p-0 pb-4 pt-4">
         <CardTitle className="text-2xl font-headline">Selamat Datang Kembali</CardTitle>
         <CardDescription>
           Pilih peran Anda untuk masuk.
