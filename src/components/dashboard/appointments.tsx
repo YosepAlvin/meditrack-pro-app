@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
   Table,
@@ -19,9 +20,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { appointments as allAppointments, doctors } from "@/lib/data"
 import type { Appointment } from "@/lib/types"
-import { MoreHorizontal, PlusCircle } from "lucide-react";
+import { MoreHorizontal, PlusCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const statusVariant = (status: Appointment['status']) => {
@@ -46,14 +46,35 @@ export default function Appointments() {
   const searchParams = useSearchParams();
   const doctorId = searchParams.get('doctor');
   
-  // Find the doctor's name based on the ID from the URL
-  const activeDoctor = doctors.find(d => d.id === doctorId);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Filter appointments based on the active doctor's name.
-  // If no doctor is found in URL, show all appointments (for admin view)
-  const filteredAppointments = doctorId 
-    ? allAppointments.filter(a => a.doctorName === activeDoctor?.name && a.status !== 'Dibatalkan')
-    : allAppointments.filter(a => a.status !== 'Dibatalkan');
+  useEffect(() => {
+    async function fetchAppointments() {
+      setIsLoading(true);
+      try {
+        // Jika ada doctorId di URL, tambahkan sebagai query parameter
+        const url = doctorId ? `/api/appointments?doctorId=${doctorId}` : '/api/appointments';
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error('Gagal mengambil data janji temu');
+        }
+        const data = await response.json();
+        setAppointments(data);
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: error instanceof Error ? error.message : 'Terjadi kesalahan',
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchAppointments();
+  }, [doctorId, toast]);
+
 
   const handleAction = (action: string) => {
     toast({
@@ -75,51 +96,57 @@ export default function Appointments() {
         </Button>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Pasien</TableHead>
-              <TableHead>Dokter</TableHead>
-              <TableHead>Klinik</TableHead>
-              <TableHead>Waktu</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Tindakan</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredAppointments.length > 0 ? filteredAppointments.map((appointment) => (
-              <TableRow key={appointment.id}>
-                <TableCell className="font-medium">{appointment.patientName}</TableCell>
-                <TableCell>{appointment.doctorName}</TableCell>
-                <TableCell>{appointment.clinic}</TableCell>
-                <TableCell>{appointment.time}</TableCell>
-                <TableCell>
-                  <Badge variant={statusVariant(appointment.status)}>{appointment.status}</Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Buka menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleAction('Edit')}>Edit</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleAction('Batalkan')}>Batalkan</DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            )) : (
+         {isLoading ? (
+          <div className="flex justify-center items-center h-40">
+            <Loader2 className="animate-spin" />
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground">
-                  Tidak ada janji temu untuk ditampilkan.
-                </TableCell>
+                <TableHead>Pasien</TableHead>
+                <TableHead>Dokter</TableHead>
+                <TableHead>Klinik</TableHead>
+                <TableHead>Waktu</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Tindakan</TableHead>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {appointments.length > 0 ? appointments.map((appointment) => (
+                <TableRow key={appointment.id}>
+                  <TableCell className="font-medium">{appointment.patientName}</TableCell>
+                  <TableCell>{appointment.doctorName}</TableCell>
+                  <TableCell>{appointment.clinic}</TableCell>
+                  <TableCell>{appointment.time}</TableCell>
+                  <TableCell>
+                    <Badge variant={statusVariant(appointment.status)}>{appointment.status}</Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                      <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                              <span className="sr-only">Buka menu</span>
+                              <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleAction('Edit')}>Edit</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleAction('Batalkan')}>Batalkan</DropdownMenuItem>
+                          </DropdownMenuContent>
+                      </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              )) : (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-muted-foreground">
+                    Tidak ada janji temu untuk ditampilkan.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        )}
       </CardContent>
     </Card>
   )
