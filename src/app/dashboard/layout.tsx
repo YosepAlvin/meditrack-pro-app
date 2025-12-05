@@ -19,6 +19,9 @@ import {
 } from '@/components/ui/sidebar';
 import Header from "@/components/header";
 import ActiveLink from "@/components/active-link";
+import dynamic from 'next/dynamic';
+
+const ClientHeader = dynamic(() => import('@/components/header'), { ssr: false });
 
 export default function DashboardLayout({
   children,
@@ -73,7 +76,7 @@ export default function DashboardLayout({
         <SidebarFooter/>
       </Sidebar>
       <SidebarInset>
-        <Header title="Dasbor Dokter" />
+        <ClientHeader title="Dasbor Dokter" />
         {children}
       </SidebarInset>
     </SidebarProvider>
