@@ -4,7 +4,7 @@ import {
   CalendarDays,
   LayoutDashboard,
   Pill,
-  Rocket,
+  Stethoscope,
   ShieldCheck,
   Users,
 } from 'lucide-react';
@@ -32,7 +32,7 @@ export default function AdminDashboardLayout({
         <SidebarHeader>
           <div className="flex items-center gap-2 p-2">
             <div className="bg-primary p-2 rounded-lg">
-                <Rocket className="w-6 h-6 text-primary-foreground" />
+                <Stethoscope className="w-6 h-6 text-primary-foreground" />
             </div>
             <h1 className="text-xl font-semibold font-headline">MediTrack Pro</h1>
           </div>

@@ -4,7 +4,7 @@ import {
   CalendarDays,
   LayoutDashboard,
   Pill,
-  Rocket,
+  Stethoscope,
   Users,
 } from 'lucide-react';
 import {
@@ -17,9 +17,9 @@ import {
   SidebarFooter,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import Header from "@/components/header";
 import ActiveLink from "@/components/active-link";
 import { Suspense } from "react";
+import ClientHeader from "@/components/client-header";
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
   return (
@@ -28,7 +28,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         <SidebarHeader>
           <div className="flex items-center gap-2 p-2">
             <div className="bg-primary p-2 rounded-lg">
-                <Rocket className="w-6 h-6 text-primary-foreground" />
+                <Stethoscope className="w-6 h-6 text-primary-foreground" />
             </div>
             <h1 className="text-xl font-semibold font-headline">MediTrack Pro</h1>
           </div>
@@ -70,7 +70,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         <SidebarFooter/>
       </Sidebar>
       <SidebarInset>
-        <Header title="Dasbor Dokter" />
+        <ClientHeader title="Dasbor Dokter" />
         {children}
       </SidebarInset>
     </SidebarProvider>

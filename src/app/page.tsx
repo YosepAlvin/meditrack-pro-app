@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Rocket } from 'lucide-react';
+import { Stethoscope } from 'lucide-react';
 
 import {
   Card,
@@ -20,7 +20,7 @@ export default function AuthenticationPage() {
         <CardHeader className="text-center">
             <div className="flex justify-center items-center mb-4">
                 <div className="bg-primary p-3 rounded-full">
-                    <Rocket className="w-8 h-8 text-primary-foreground" />
+                    <Stethoscope className="w-8 h-8 text-primary-foreground" />
                 </div>
             </div>
           <CardTitle className="text-3xl font-headline">MediTrack Pro</CardTitle>
