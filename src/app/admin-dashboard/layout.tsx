@@ -20,10 +20,6 @@ import {
 } from '@/components/ui/sidebar';
 import Header from "@/components/header";
 import ActiveLink from "@/components/active-link";
-import dynamic from 'next/dynamic';
-
-const ClientHeader = dynamic(() => import('@/components/header'), { ssr: false });
-
 
 export default function AdminDashboardLayout({
   children,
@@ -84,7 +80,7 @@ export default function AdminDashboardLayout({
         <SidebarFooter/>
       </Sidebar>
       <SidebarInset>
-        <ClientHeader title="Dasbor Admin" />
+        <Header title="Dasbor Admin" />
         {children}
       </SidebarInset>
     </SidebarProvider>
