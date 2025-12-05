@@ -17,8 +17,7 @@ import DoctorProfile from '@/components/dashboard/doctor/doctor-profile';
 import PracticeSchedule from '@/components/dashboard/doctor/practice-schedule';
 import RecentMedicalRecords from '@/components/dashboard/doctor/recent-medical-records';
 import Link from 'next/link';
-import { doctors, appointments as mockAppointments, medications as mockMedications } from '@/lib/data';
-import type { Appointment, Medication } from '@/lib/types';
+import type { Appointment } from '@/lib/types';
 import Appointments from '@/components/dashboard/appointments';
 import MedicationStock from '@/components/dashboard/medication-stock';
 
@@ -62,14 +61,9 @@ function QuickActions() {
   );
 }
 
-function MiniAnalytics() {
-    const searchParams = useSearchParams();
-    const doctorId = searchParams.get('doctor') || 'dr-wahyu';
-    const doctor = doctors.find(d => d.id === doctorId);
-
-    const patientCount = mockAppointments.filter(a => a.doctorName === doctor?.name).length;
-    const completedPatientCount = mockAppointments.filter(a => a.doctorName === doctor?.name && a.status === 'Selesai').length;
-
+function MiniAnalytics({ appointments }: { appointments: Appointment[] }) {
+    const patientCount = appointments.length;
+    const completedPatientCount = appointments.filter(a => a.status === 'Selesai').length;
 
     return (
          <div className="grid gap-4 md:grid-cols-2">
@@ -110,7 +104,7 @@ export default function DashboardPage() {
         <div className="space-y-4">
           <DoctorProfile />
           <QuickActions />
-          <MiniAnalytics />
+          {/*<MiniAnalytics appointments={appointments} />*/}
           <RecentMedicalRecords />
         </div>
       </div>

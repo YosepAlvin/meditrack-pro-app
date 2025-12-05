@@ -11,7 +11,17 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { medicalRecords as allRecords, doctors } from "@/lib/data"
+import type { MedicalRecord } from "@/lib/types";
+
+const allRecords: MedicalRecord[] = [
+    { id: 'rec-1', patientName: 'Siti Aminah', doctorName: 'Dr. Indah', date: '2023-11-15', diagnosis: 'Migrain kronis', prescription: 'Sumatriptan 50mg' },
+    { id: 'rec-2', patientName: 'Budi Sanjoyo', doctorName: 'Dr. Wahyu', date: '2023-11-14', diagnosis: 'Hipertensi', prescription: 'Lisinopril 10mg' },
+];
+
+const doctors = [
+  { id: 'dr-wahyu', name: 'Dr. Wahyu' },
+  { id: 'dr-indah', name: 'Dr. Indah' },
+];
 
 export default function RecentMedicalRecords() {
     const searchParams = useSearchParams();

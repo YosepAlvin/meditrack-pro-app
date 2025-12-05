@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -9,11 +9,31 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { doctors } from "@/lib/data"; // Import data
+import type { Doctor } from "@/lib/types";
 
 export default function BuatJanjiTemuPage() {
     const { toast } = useToast();
+    const [doctors, setDoctors] = useState<Doctor[]>([]);
     const [selectedDoctorId, setSelectedDoctorId] = useState<string | null>(null);
+
+     useEffect(() => {
+        async function fetchDoctors() {
+            try {
+                const res = await fetch('/api/doctors');
+                if (!res.ok) throw new Error('Gagal mengambil data dokter');
+                const data = await res.json();
+                setDoctors(data);
+            } catch (error) {
+                 toast({
+                    title: "Error",
+                    description: "Gagal memuat data dokter.",
+                    variant: "destructive",
+                });
+            }
+        }
+        fetchDoctors();
+    }, [toast]);
+
 
     const handleCreateAppointment = () => {
         if (!selectedDoctorId) {
@@ -29,18 +49,7 @@ export default function BuatJanjiTemuPage() {
         if (!selectedDoctor) return;
 
         // Simulasi pengiriman permintaan janji temu
-        const newAppointment = {
-            id: Math.random() * 1000,
-            patientName: "Budi Sanjoyo", // Nama pasien yang login (hardcoded untuk demo)
-            doctorName: selectedDoctor.name,
-            doctorId: selectedDoctor.id,
-            clinic: selectedDoctor.specialty,
-            time: "15:00", // Waktu default
-            status: "Menunggu" as const,
-            complaint: "Keluhan baru",
-            appointment_date: new Date().toISOString().slice(0, 10),
-        };
-
+        // Di aplikasi nyata, ini akan menjadi panggilan API POST
         toast({
             title: `Permintaan Terkirim ke ${selectedDoctor.name}!`,
             description: "Janji temu Anda sedang menunggu konfirmasi.",

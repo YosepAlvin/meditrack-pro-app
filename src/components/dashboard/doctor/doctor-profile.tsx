@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useSearchParams } from "next/navigation";
@@ -5,25 +6,20 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, UserCheck } from "lucide-react";
-import { doctors } from "@/lib/data";
 import type { Doctor } from "@/lib/types";
 
+// Fungsi helper untuk membuat profil dokter dinamis dari URL.
+// Ini berguna jika dokter belum ada di data awal.
 const getDoctor = (searchParams: URLSearchParams): Doctor | null => {
     const doctorId = searchParams.get('doctor');
-    if (!doctorId) return doctors[0]; // fallback ke dokter pertama
-
-    const existingDoctor = doctors.find(d => d.id === doctorId);
-    if (existingDoctor) return existingDoctor;
-
-    // Jika tidak ada, buat dokter baru dari URL params
     const name = searchParams.get('name');
     const specialty = searchParams.get('specialty');
 
-    if (name && specialty) {
+    if (name) {
         return {
-            id: doctorId,
+            id: doctorId || `dr-${name.toLowerCase().replace(/ /g, '-')}`,
             name: name,
-            specialty: specialty,
+            specialty: specialty || 'Spesialis Umum',
             avatarUrl: `https://picsum.photos/seed/${Buffer.from(name).toString('hex')}/100/100`
         };
     }
@@ -41,7 +37,7 @@ export default function DoctorProfile() {
                     <CardTitle className="text-lg">Profil Dokter</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p>Dokter tidak ditemukan.</p>
+                    <p>Pilih dokter untuk melihat profil.</p>
                 </CardContent>
             </Card>
         )

@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -10,11 +10,30 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
-import { doctors } from "@/lib/data"; // Import data
+import type { Doctor } from "@/lib/types";
 
 export default function BuatJanjiTemuAdminPage() {
     const { toast } = useToast();
+    const [doctors, setDoctors] = useState<Doctor[]>([]);
     const [selectedDoctorId, setSelectedDoctorId] = useState<string | null>(null);
+
+    useEffect(() => {
+        async function fetchDoctors() {
+            try {
+                const res = await fetch('/api/doctors');
+                if (!res.ok) throw new Error('Gagal mengambil data dokter');
+                const data = await res.json();
+                setDoctors(data);
+            } catch (error) {
+                 toast({
+                    title: "Error",
+                    description: "Gagal memuat data dokter.",
+                    variant: "destructive",
+                });
+            }
+        }
+        fetchDoctors();
+    }, [toast]);
 
 
     const handleCreateAppointment = () => {
@@ -32,18 +51,6 @@ export default function BuatJanjiTemuAdminPage() {
 
         // Simulasi pembuatan janji temu baru.
         // Di aplikasi nyata, ini akan menjadi panggilan API.
-        const newAppointment = {
-            id: Math.random() * 1000,
-            patientName: "Pasien Baru (dari Admin)",
-            doctorName: selectedDoctor.name,
-            doctorId: selectedDoctor.id,
-            clinic: selectedDoctor.specialty,
-            time: "16:00", // Waktu default
-            status: "Terkonfirmasi" as const,
-            complaint: "Didaftarkan oleh Staf",
-            appointment_date: new Date().toISOString().slice(0, 10),
-        };
-
         toast({
             title: "Janji Temu Dibuat!",
             description: `Janji temu baru untuk ${selectedDoctor.name} telah disimulasikan.`,

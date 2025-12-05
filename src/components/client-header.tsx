@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -14,10 +15,20 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { LogOut, User } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { doctors, patients } from '@/lib/data';
 import type { Doctor, Patient } from '@/lib/types';
 
-const getDynamicUser = (searchParams: URLSearchParams): Doctor | Patient | null => {
+// Data pasien dan dokter bisa dipindahkan ke state atau context jika diperlukan
+const patients: Omit<Patient, 'lastVisit'>[] = [
+     { id: '1', name: 'Budi Sanjoyo', avatarUrl: 'https://picsum.photos/seed/1/40/40', email: 'budi.sanjoyo@example.com' },
+     { id: '2', name: 'Siti Aminah', avatarUrl: 'https://picsum.photos/seed/2/40/40', email: 'siti.aminah@example.com' },
+];
+
+const doctors: Doctor[] = [
+    { id: 'dr-wahyu', name: 'Dr. Wahyu', specialty: 'Spesialis Kardiologi', avatarUrl: 'https://picsum.photos/seed/101/100/100' },
+    { id: 'dr-indah', name: 'Dr. Indah', specialty: 'Spesialis Neurologi', avatarUrl: 'https://picsum.photos/seed/102/100/100' },
+];
+
+const getDynamicUser = (searchParams: URLSearchParams): Partial<Doctor & Patient> | null => {
     const doctorId = searchParams.get('doctor');
     const patientId = searchParams.get('patient');
     const name = searchParams.get('name');
@@ -25,7 +36,6 @@ const getDynamicUser = (searchParams: URLSearchParams): Doctor | Patient | null 
     if (doctorId && name) {
         let doctor = doctors.find(d => d.id === doctorId);
         if (!doctor) {
-            // Buat dokter baru secara dinamis jika tidak ditemukan
             const specialty = searchParams.get('specialty') || 'Spesialis Umum';
             doctor = {
                 id: doctorId,
@@ -40,13 +50,11 @@ const getDynamicUser = (searchParams: URLSearchParams): Doctor | Patient | null 
     if (patientId && name) {
         let patient = patients.find(p => p.id === patientId);
         if (!patient) {
-            // Buat pasien baru secara dinamis jika tidak ditemukan
             patient = {
                 id: patientId,
                 name: name,
                 email: `${name.split(' ')[0].toLowerCase()}@example.com`,
                 avatarUrl: `https://picsum.photos/seed/${Buffer.from(name).toString('hex')}/40/40`,
-                lastVisit: new Date().toISOString().split('T')[0]
             };
         }
         return patient;

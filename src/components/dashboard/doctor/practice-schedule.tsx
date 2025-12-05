@@ -4,7 +4,14 @@
 import { useSearchParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { practiceSchedules as allSchedules } from "@/lib/data"
+import type { PracticeSchedule } from "@/lib/types";
+
+const allSchedules: PracticeSchedule[] = [
+    { id: 'sch-1', doctorId: 'dr-wahyu', startTime: '08:00', endTime: '12:00', clinic: 'Poli Jantung', room: 'Ruang 5', status: 'Sedang Berlangsung' },
+    { id: 'sch-3', doctorId: 'dr-indah', startTime: '09:00', endTime: '13:00', clinic: 'Poli Saraf', room: 'Ruang 2', status: 'Sedang Berlangsung' },
+    { id: 'sch-5', doctorId: 'dr-gunawan', startTime: '08:00', endTime: '12:00', clinic: 'Poli Anak', room: 'Ruang 1', status: 'Sedang Berlangsung' },
+];
+
 
 const statusVariant = (status: string) => {
     switch(status) {

@@ -8,7 +8,6 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { patients as initialPatients } from "@/lib/data"
 import type { Patient } from "@/lib/types";
 import { Search, MoreHorizontal, PlusCircle } from "lucide-react"
 import {
@@ -20,6 +19,12 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label";
+
+const initialPatients: Patient[] = [
+  { id: '1', name: 'Budi Sanjoyo', avatarUrl: 'https://picsum.photos/seed/1/40/40', email: 'budi.sanjoyo@example.com', lastVisit: '2023-10-26' },
+  { id: '2', name: 'Siti Aminah', avatarUrl: 'https://picsum.photos/seed/2/40/40', email: 'siti.aminah@example.com', lastVisit: '2023-10-25' },
+];
+
 
 export default function PatientLookup() {
   const [searchTerm, setSearchTerm] = useState("");
