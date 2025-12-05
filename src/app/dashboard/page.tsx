@@ -13,6 +13,7 @@ import DoctorProfile from '@/components/dashboard/doctor/doctor-profile';
 import PracticeSchedule from '@/components/dashboard/doctor/practice-schedule';
 import PatientQueue from '@/components/dashboard/doctor/patient-queue';
 import RecentMedicalRecords from '@/components/dashboard/doctor/recent-medical-records';
+import Link from 'next/link';
 
 function QuickActions() {
   return (
@@ -21,21 +22,29 @@ function QuickActions() {
         <CardTitle className="text-lg">Akses Cepat</CardTitle>
       </CardHeader>
       <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-2">
-        <Button variant="outline" className="flex-col h-auto">
-          <ClipboardPlus className="mb-2" />
-          <span>Tambah Rekam Medis</span>
+        <Button variant="outline" className="flex-col h-auto" asChild>
+          <Link href="/dashboard/pasien">
+            <ClipboardPlus className="mb-2" />
+            <span>Tambah Rekam Medis</span>
+          </Link>
         </Button>
-        <Button variant="outline" className="flex-col h-auto">
-          <Pill className="mb-2" />
-          <span>Tulis Resep</span>
+        <Button variant="outline" className="flex-col h-auto" asChild>
+          <Link href="/dashboard/obat">
+            <Pill className="mb-2" />
+            <span>Tulis Resep</span>
+          </Link>
         </Button>
-        <Button variant="outline" className="flex-col h-auto">
-          <CalendarClock className="mb-2" />
-          <span>Lihat Jadwal</span>
+        <Button variant="outline" className="flex-col h-auto" asChild>
+          <Link href="/dashboard/janji-temu">
+            <CalendarClock className="mb-2" />
+            <span>Lihat Jadwal</span>
+          </Link>
         </Button>
-        <Button variant="outline" className="flex-col h-auto">
-          <BookUser className="mb-2" />
-          <span>Cari Pasien</span>
+        <Button variant="outline" className="flex-col h-auto" asChild>
+          <Link href="/dashboard/pasien">
+            <BookUser className="mb-2" />
+            <span>Cari Pasien</span>
+          </Link>
         </Button>
       </CardContent>
     </Card>
