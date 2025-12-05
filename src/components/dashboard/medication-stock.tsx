@@ -16,16 +16,16 @@ export default function MedicationStock() {
   return (
     <Card className="shadow-md">
       <CardHeader>
-        <CardTitle>Medication Stock</CardTitle>
-        <CardDescription>Manage and monitor medication inventory.</CardDescription>
+        <CardTitle>Stok Obat</CardTitle>
+        <CardDescription>Kelola dan pantau inventaris obat.</CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Medication</TableHead>
-              <TableHead>Stock</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>Obat</TableHead>
+              <TableHead>Stok</TableHead>
+              <TableHead className="text-right">Tindakan</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -37,18 +37,18 @@ export default function MedicationStock() {
                 </TableCell>
                 <TableCell>
                   {med.stock <= med.lowStockThreshold ? (
-                    <Badge variant="destructive">Low Stock</Badge>
+                    <Badge variant="destructive">Stok Rendah</Badge>
                   ) : null}
                   <span className="ml-2">{med.stock}</span>
                 </TableCell>
                 <TableCell className="text-right space-x-2">
                   <Button variant="ghost" size="icon" className="h-8 w-8">
                     <MinusCircle className="h-4 w-4" />
-                    <span className="sr-only">Decrease stock</span>
+                    <span className="sr-only">Kurangi stok</span>
                   </Button>
                   <Button variant="ghost" size="icon" className="h-8 w-8">
                     <PlusCircle className="h-4 w-4" />
-                    <span className="sr-only">Increase stock</span>
+                    <span className="sr-only">Tambah stok</span>
                   </Button>
                 </TableCell>
               </TableRow>

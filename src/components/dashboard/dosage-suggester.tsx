@@ -23,12 +23,12 @@ function SubmitButton() {
       {pending ? (
         <>
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Generating...
+          Menghasilkan...
         </>
       ) : (
         <>
           <Wand2 className="mr-2 h-4 w-4" />
-          Get Suggestion
+          Dapatkan Saran
         </>
       )}
     </Button>
@@ -41,38 +41,38 @@ export default function DosageSuggester() {
   return (
     <Card className="shadow-md">
       <CardHeader>
-        <CardTitle>AI Dosage Suggester</CardTitle>
-        <CardDescription>Enter patient data to receive an AI-assisted dosage suggestion. For professional use only.</CardDescription>
+        <CardTitle>Penyaran Dosis AI</CardTitle>
+        <CardDescription>Masukkan data pasien untuk menerima saran dosis dengan bantuan AI. Hanya untuk penggunaan profesional.</CardDescription>
       </CardHeader>
       <CardContent>
         <form action={formAction} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="patientName">Patient Name</Label>
-              <Input id="patientName" name="patientName" placeholder="e.g., John Doe" />
+              <Label htmlFor="patientName">Nama Pasien</Label>
+              <Input id="patientName" name="patientName" placeholder="cth., Budi Sanjoyo" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="patientAge">Age (years)</Label>
-              <Input id="patientAge" name="patientAge" type="number" placeholder="e.g., 45" />
+              <Label htmlFor="patientAge">Usia (tahun)</Label>
+              <Input id="patientAge" name="patientAge" type="number" placeholder="cth., 45" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="patientWeight">Weight (kg)</Label>
-              <Input id="patientWeight" name="patientWeight" type="number" placeholder="e.g., 70" />
+              <Label htmlFor="patientWeight">Berat (kg)</Label>
+              <Input id="patientWeight" name="patientWeight" type="number" placeholder="cth., 70" />
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="medicationName">Medication Name</Label>
-              <Input id="medicationName" name="medicationName" placeholder="e.g., Amoxicillin" />
+              <Label htmlFor="medicationName">Nama Obat</Label>
+              <Input id="medicationName" name="medicationName" placeholder="cth., Amoksisilin" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="medicationStrength">Strength</Label>
-              <Input id="medicationStrength" name="medicationStrength" placeholder="e.g., 500mg" />
+              <Label htmlFor="medicationStrength">Kekuatan</Label>
+              <Input id="medicationStrength" name="medicationStrength" placeholder="cth., 500mg" />
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="patientMedicalHistory">Medical History</Label>
-            <Textarea id="patientMedicalHistory" name="patientMedicalHistory" placeholder="e.g., Allergic to Penicillin, history of hypertension." />
+            <Label htmlFor="patientMedicalHistory">Riwayat Medis</Label>
+            <Textarea id="patientMedicalHistory" name="patientMedicalHistory" placeholder="cth., Alergi Penisilin, riwayat hipertensi." />
           </div>
           <SubmitButton />
         </form>
@@ -87,10 +87,10 @@ export default function DosageSuggester() {
         {state.success && state.data && (
             <Alert className="mt-4 border-accent">
                 <Lightbulb className="h-4 w-4 text-accent" />
-                <AlertTitle className="text-accent">AI Suggestion</AlertTitle>
+                <AlertTitle className="text-accent">Saran AI</AlertTitle>
                 <AlertDescription className="space-y-2">
-                    <p><strong>Suggested Dosage:</strong> {state.data.suggestedDosage}</p>
-                    <p><strong>Reasoning:</strong> {state.data.reasoning}</p>
+                    <p><strong>Dosis yang Disarankan:</strong> {state.data.suggestedDosage}</p>
+                    <p><strong>Alasan:</strong> {state.data.reasoning}</p>
                 </AlertDescription>
             </Alert>
         )}

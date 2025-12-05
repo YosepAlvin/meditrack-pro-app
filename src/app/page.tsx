@@ -30,14 +30,14 @@ export default function AuthenticationPage() {
             </div>
           <CardTitle className="text-3xl font-headline">MediTrack Pro</CardTitle>
           <CardDescription>
-            Your all-in-one clinic management solution.
+            Solusi manajemen klinik lengkap Anda.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="login" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="register">Register</TabsTrigger>
+              <TabsTrigger value="login">Masuk</TabsTrigger>
+              <TabsTrigger value="register">Daftar</TabsTrigger>
             </TabsList>
             <TabsContent value="login">
               <LoginForm />
@@ -47,19 +47,19 @@ export default function AuthenticationPage() {
             </TabsContent>
           </Tabs>
           <p className="mt-4 px-8 text-center text-xs text-muted-foreground">
-            By clicking continue, you agree to our{' '}
+            Dengan mengklik lanjutkan, Anda menyetujui{' '}
             <Link
               href="/terms"
               className="underline underline-offset-4 hover:text-primary"
             >
-              Terms of Service
+              Ketentuan Layanan
             </Link>{' '}
-            and{' '}
+            kami dan{' '}
             <Link
               href="/privacy"
               className="underline underline-offset-4 hover:text-primary"
             >
-              Privacy Policy
+              Kebijakan Privasi
             </Link>
             .
           </p>

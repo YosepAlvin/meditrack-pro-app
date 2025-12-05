@@ -42,7 +42,7 @@ export default function DashboardLayout({
               <SidebarMenuButton href="/dashboard" asChild isActive>
                 <Link href="/dashboard">
                   <LayoutDashboard />
-                  Dashboard
+                  Dasbor
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -50,7 +50,7 @@ export default function DashboardLayout({
               <SidebarMenuButton href="#" asChild>
                 <Link href="#">
                   <CalendarDays />
-                  Appointments
+                  Janji Temu
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -58,7 +58,7 @@ export default function DashboardLayout({
               <SidebarMenuButton href="#" asChild>
                 <Link href="#">
                   <Users />
-                  Patients
+                  Pasien
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -66,7 +66,7 @@ export default function DashboardLayout({
               <SidebarMenuButton href="#" asChild>
                 <Link href="#">
                   <Pill />
-                  Medication
+                  Obat
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -74,7 +74,7 @@ export default function DashboardLayout({
               <SidebarMenuButton href="#" asChild>
                 <Link href="#">
                   <BrainCircuit />
-                  Dosage AI
+                  Dosis AI
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

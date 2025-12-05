@@ -18,9 +18,9 @@ export function LoginForm() {
   return (
     <Card className="border-0 shadow-none">
       <CardHeader className="space-y-1 text-left p-0 pb-4">
-        <CardTitle className="text-2xl font-headline">Welcome Back</CardTitle>
+        <CardTitle className="text-2xl font-headline">Selamat Datang Kembali</CardTitle>
         <CardDescription>
-          Enter your email below to login to your account.
+          Masukkan email Anda di bawah ini untuk masuk ke akun Anda.
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4 p-0">
@@ -29,13 +29,13 @@ export function LoginForm() {
           <Input id="email" type="email" placeholder="m@example.com" />
         </div>
         <div className="grid gap-2">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">Kata Sandi</Label>
           <Input id="password" type="password" />
         </div>
       </CardContent>
       <CardFooter className="p-0 pt-4">
         <Button className="w-full" asChild>
-          <Link href="/dashboard">Sign In</Link>
+          <Link href="/dashboard">Masuk</Link>
         </Button>
       </CardFooter>
     </Card>

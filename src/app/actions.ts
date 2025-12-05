@@ -4,12 +4,12 @@ import { suggestDosage, type DosageSuggestionInput } from '@/ai/flows/ai-dosage-
 import { z } from 'zod';
 
 const DosageSuggestionInputSchema = z.object({
-  patientName: z.string().min(1, 'Patient name is required.'),
-  patientAge: z.coerce.number().min(0, 'Age must be a positive number.'),
-  patientWeight: z.coerce.number().min(0, 'Weight must be a positive number.'),
-  patientMedicalHistory: z.string().min(1, 'Medical history is required.'),
-  medicationName: z.string().min(1, 'Medication name is required.'),
-  medicationStrength: z.string().min(1, 'Medication strength is required.'),
+  patientName: z.string().min(1, 'Nama pasien harus diisi.'),
+  patientAge: z.coerce.number().min(0, 'Usia harus berupa angka positif.'),
+  patientWeight: z.coerce.number().min(0, 'Berat badan harus berupa angka positif.'),
+  patientMedicalHistory: z.string().min(1, 'Riwayat medis harus diisi.'),
+  medicationName: z.string().min(1, 'Nama obat harus diisi.'),
+  medicationStrength: z.string().min(1, 'Kekuatan obat harus diisi.'),
 });
 
 type State = {
@@ -29,7 +29,7 @@ export async function getDosageSuggestion(prevState: State, formData: FormData):
   if (!validatedFields.success) {
     return {
       success: false,
-      message: validatedFields.error.flatten().fieldErrors[Object.keys(validatedFields.error.flatten().fieldErrors)[0]]?.[0] || 'Invalid input.',
+      message: validatedFields.error.flatten().fieldErrors[Object.keys(validatedFields.error.flatten().fieldErrors)[0]]?.[0] || 'Input tidak valid.',
     };
   }
 
@@ -37,14 +37,14 @@ export async function getDosageSuggestion(prevState: State, formData: FormData):
     const result = await suggestDosage(validatedFields.data as DosageSuggestionInput);
     return { 
       success: true, 
-      message: 'Suggestion generated successfully.',
+      message: 'Saran berhasil dibuat.',
       data: result,
     };
   } catch (error) {
     console.error(error);
     return { 
         success: false, 
-        message: 'An error occurred while generating the suggestion.' 
+        message: 'Terjadi kesalahan saat membuat saran.' 
     };
   }
 }

@@ -17,7 +17,7 @@ export type Appointment = {
   doctorName: string;
   clinic: string;
   time: string;
-  status: 'Confirmed' | 'Pending' | 'Cancelled';
+  status: 'Terkonfirmasi' | 'Menunggu' | 'Dibatalkan';
 };
 
 export type Medication = {

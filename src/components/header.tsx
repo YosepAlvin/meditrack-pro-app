@@ -18,30 +18,30 @@ export default function Header() {
       <div className="md:hidden">
         <SidebarTrigger />
       </div>
-      <h1 className="text-xl font-semibold md:text-2xl font-headline">Dashboard</h1>
+      <h1 className="text-xl font-semibold md:text-2xl font-headline">Dasbor</h1>
       <div className="ml-auto flex items-center gap-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="secondary" size="icon" className="rounded-full">
               <Avatar>
-                <AvatarImage src="https://picsum.photos/seed/100/40/40" alt="User avatar" data-ai-hint="person portrait" />
+                <AvatarImage src="https://picsum.photos/seed/100/40/40" alt="Avatar pengguna" data-ai-hint="person portrait" />
                 <AvatarFallback>AD</AvatarFallback>
               </Avatar>
-              <span className="sr-only">Toggle user menu</span>
+              <span className="sr-only">Buka menu pengguna</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Admin Account</DropdownMenuLabel>
+            <DropdownMenuLabel>Akun Admin</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
                 <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
+                <span>Profil</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <Link href="/">
                 <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
+                <span>Keluar</span>
               </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>

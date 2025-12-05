@@ -13,11 +13,11 @@ import type { Appointment } from "@/lib/types"
 
 const statusVariant = (status: Appointment['status']) => {
   switch (status) {
-    case 'Confirmed':
+    case 'Terkonfirmasi':
       return 'default';
-    case 'Pending':
+    case 'Menunggu':
       return 'secondary';
-    case 'Cancelled':
+    case 'Dibatalkan':
       return 'destructive';
     default:
       return 'outline';
@@ -28,17 +28,17 @@ export default function Appointments() {
   return (
     <Card className="shadow-md">
       <CardHeader>
-        <CardTitle>Recent Appointments</CardTitle>
-        <CardDescription>A list of appointments scheduled for today.</CardDescription>
+        <CardTitle>Janji Temu Terbaru</CardTitle>
+        <CardDescription>Daftar janji temu yang dijadwalkan untuk hari ini.</CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Patient</TableHead>
-              <TableHead>Doctor</TableHead>
-              <TableHead>Clinic</TableHead>
-              <TableHead>Time</TableHead>
+              <TableHead>Pasien</TableHead>
+              <TableHead>Dokter</TableHead>
+              <TableHead>Klinik</TableHead>
+              <TableHead>Waktu</TableHead>
               <TableHead className="text-right">Status</TableHead>
             </TableRow>
           </TableHeader>
