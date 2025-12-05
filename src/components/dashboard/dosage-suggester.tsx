@@ -1,6 +1,6 @@
 "use client";
 
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState, useFormStatus } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -35,7 +35,7 @@ function SubmitButton() {
 }
 
 export default function DosageSuggester() {
-  const [state, formAction] = useFormState(getDosageSuggestion, initialState);
+  const [state, formAction] = useActionState(getDosageSuggestion, initialState);
 
   return (
     <Card className="shadow-md">
