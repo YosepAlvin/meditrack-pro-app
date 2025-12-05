@@ -1,5 +1,6 @@
 "use client";
 import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   Table,
   TableBody,
@@ -11,7 +12,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button";
-import { appointments as initialAppointments } from "@/lib/data"
+import { appointments as initialAppointments, doctors } from "@/lib/data"
 import type { Appointment } from "@/lib/types"
 
 const statusVariant = (status: Appointment['status']) => {
@@ -28,7 +29,13 @@ const statusVariant = (status: Appointment['status']) => {
 }
 
 export default function PatientQueue() {
-    const [appointments, setAppointments] = useState<Appointment[]>(initialAppointments.filter(a => a.status !== 'Dibatalkan'));
+    const searchParams = useSearchParams();
+    const doctorId = searchParams.get('doctor') || 'dr-wahyu';
+    const doctor = doctors.find(d => d.id === doctorId);
+
+    const [appointments, setAppointments] = useState<Appointment[]>(
+        initialAppointments.filter(a => a.doctorName === doctor?.name && a.status !== 'Dibatalkan')
+    );
 
     const handleCallPatient = (id: string) => {
         setAppointments(prev => prev.map(app => {
@@ -57,7 +64,7 @@ export default function PatientQueue() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {appointments.map((appointment, index) => (
+            {appointments.length > 0 ? appointments.map((appointment, index) => (
               <TableRow key={appointment.id}>
                 <TableCell className="font-medium">#{index + 1}</TableCell>
                 <TableCell>{appointment.patientName}</TableCell>
@@ -75,7 +82,11 @@ export default function PatientQueue() {
                   </Button>
                 </TableCell>
               </TableRow>
-            ))}
+            )) : (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center text-muted-foreground">Tidak ada pasien dalam antrian.</TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </CardContent>

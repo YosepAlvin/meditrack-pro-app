@@ -1,3 +1,7 @@
+
+"use client";
+
+import { useSearchParams } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -7,9 +11,16 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { medicalRecords } from "@/lib/data"
+import { medicalRecords as allRecords, doctors } from "@/lib/data"
 
 export default function RecentMedicalRecords() {
+    const searchParams = useSearchParams();
+    const doctorId = searchParams.get('doctor') || 'dr-wahyu';
+    const doctor = doctors.find(d => d.id === doctorId);
+
+    const medicalRecords = allRecords.filter(rec => rec.doctorName === doctor?.name).slice(0, 5);
+
+
   return (
     <Card>
       <CardHeader>
@@ -25,7 +36,7 @@ export default function RecentMedicalRecords() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {medicalRecords.slice(0, 5).map((record) => (
+            {medicalRecords.length > 0 ? medicalRecords.map((record) => (
               <TableRow key={record.id}>
                 <TableCell>
                     <div className="font-medium">{record.patientName}</div>
@@ -33,7 +44,13 @@ export default function RecentMedicalRecords() {
                 </TableCell>
                 <TableCell>{record.diagnosis}</TableCell>
               </TableRow>
-            ))}
+            )) : (
+                <TableRow>
+                    <TableCell colSpan={2} className="text-center text-muted-foreground">
+                        Belum ada rekam medis.
+                    </TableCell>
+                </TableRow>
+            )}
           </TableBody>
         </Table>
       </CardContent>

@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
 
 export function LoginForm() {
   return (
@@ -34,14 +35,25 @@ export function LoginForm() {
         </div>
       </CardContent>
       <CardFooter className="flex flex-col gap-2 p-0 pt-4">
+        <div className="relative w-full">
+            <Separator className="my-2" />
+            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-xs text-muted-foreground">Masuk sebagai</span>
+        </div>
+
         <Button className="w-full" asChild>
-          <Link href="/admin-dashboard">Masuk sebagai Admin</Link>
+          <Link href="/admin-dashboard">Admin</Link>
         </Button>
         <Button className="w-full" asChild>
-          <Link href="/dashboard">Masuk sebagai Dokter</Link>
+          <Link href="/dashboard?doctor=dr-wahyu">Dokter Wahyu</Link>
+        </Button>
+         <Button className="w-full" asChild>
+          <Link href="/dashboard?doctor=dr-indah">Dokter Indah</Link>
+        </Button>
+         <Button className="w-full" asChild>
+          <Link href="/dashboard?doctor=dr-gunawan">Dokter Gunawan</Link>
         </Button>
         <Button variant="outline" className="w-full" asChild>
-          <Link href="/pasien-dashboard">Masuk sebagai Pasien</Link>
+          <Link href="/pasien-dashboard">Pasien</Link>
         </Button>
       </CardFooter>
     </Card>

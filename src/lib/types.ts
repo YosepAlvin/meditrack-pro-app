@@ -9,6 +9,8 @@ export type Patient = {
 export type Doctor = {
   id: string;
   name: string;
+  specialty: string;
+  avatarUrl: string;
 };
 
 export type Appointment = {
@@ -32,6 +34,7 @@ export type Medication = {
 export type MedicalRecord = {
     id: string;
     patientName: string;
+    doctorName: string;
     date: string;
     diagnosis: string;
     prescription: string;
@@ -39,6 +42,7 @@ export type MedicalRecord = {
 
 export type PracticeSchedule = {
     id: string;
+    doctorId: string;
     startTime: string;
     endTime: string;
     clinic: string;

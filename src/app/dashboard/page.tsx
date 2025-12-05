@@ -1,3 +1,7 @@
+
+"use client";
+
+import { useSearchParams } from 'next/navigation';
 import {
   Activity,
   PlusCircle,
@@ -14,8 +18,13 @@ import PracticeSchedule from '@/components/dashboard/doctor/practice-schedule';
 import PatientQueue from '@/components/dashboard/doctor/patient-queue';
 import RecentMedicalRecords from '@/components/dashboard/doctor/recent-medical-records';
 import Link from 'next/link';
+import { doctors, appointments } from '@/lib/data';
+
 
 function QuickActions() {
+    const searchParams = useSearchParams();
+    const doctor = searchParams.get('doctor') || 'dr-wahyu';
+
   return (
     <Card>
       <CardHeader>
@@ -23,25 +32,25 @@ function QuickActions() {
       </CardHeader>
       <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-2">
         <Button variant="outline" className="flex-col h-auto" asChild>
-          <Link href="/dashboard/pasien">
+          <Link href={`/dashboard/pasien?doctor=${doctor}`}>
             <ClipboardPlus className="mb-2" />
             <span>Tambah Rekam Medis</span>
           </Link>
         </Button>
         <Button variant="outline" className="flex-col h-auto" asChild>
-          <Link href="/dashboard/obat">
+          <Link href={`/dashboard/obat?doctor=${doctor}`}>
             <Pill className="mb-2" />
             <span>Tulis Resep</span>
           </Link>
         </Button>
         <Button variant="outline" className="flex-col h-auto" asChild>
-          <Link href="/dashboard/janji-temu">
+          <Link href={`/dashboard/janji-temu?doctor=${doctor}`}>
             <CalendarClock className="mb-2" />
             <span>Lihat Jadwal</span>
           </Link>
         </Button>
         <Button variant="outline" className="flex-col h-auto" asChild>
-          <Link href="/dashboard/pasien">
+          <Link href={`/dashboard/pasien?doctor=${doctor}`}>
             <BookUser className="mb-2" />
             <span>Cari Pasien</span>
           </Link>
@@ -52,6 +61,14 @@ function QuickActions() {
 }
 
 function MiniAnalytics() {
+    const searchParams = useSearchParams();
+    const doctorId = searchParams.get('doctor') || 'dr-wahyu';
+    const doctor = doctors.find(d => d.id === doctorId);
+
+    const patientCount = appointments.filter(a => a.doctorName === doctor?.name).length;
+    const completedPatientCount = appointments.filter(a => a.doctorName === doctor?.name && a.status === 'Selesai').length;
+
+
     return (
          <div className="grid gap-4 md:grid-cols-2">
             <Card>
@@ -60,8 +77,8 @@ function MiniAnalytics() {
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">12</div>
-                <p className="text-xs text-muted-foreground">2 pasien telah selesai</p>
+                <div className="text-2xl font-bold">{patientCount}</div>
+                <p className="text-xs text-muted-foreground">{completedPatientCount} pasien telah selesai</p>
               </CardContent>
             </Card>
             <Card>
