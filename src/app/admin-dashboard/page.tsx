@@ -2,6 +2,13 @@ import Overview from "@/components/dashboard/overview";
 import Appointments from "@/components/dashboard/appointments";
 import PatientLookup from "@/components/dashboard/patient-lookup";
 import MedicationStock from "@/components/dashboard/medication-stock";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
 
 function UserManagementCard() {
     return (
