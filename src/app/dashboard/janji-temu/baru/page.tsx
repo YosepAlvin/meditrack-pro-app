@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
-import { doctors, appointments } from "@/lib/data"; // Import data
+import { doctors } from "@/lib/data"; // Import data
 
 export default function BuatJanjiTemuDokterPage() {
     const { toast } = useToast();
@@ -32,7 +32,7 @@ export default function BuatJanjiTemuDokterPage() {
 
         // Buat janji temu baru
         const newAppointment = {
-            id: appointments.length + 200, // ID sementara yang unik
+            id: Math.random() * 1000, // ID sementara yang unik
             patientName: "Pasien Baru", // Hardcoded untuk demo
             doctorName: selectedDoctor.name,
             doctorId: selectedDoctor.id,
@@ -87,7 +87,7 @@ export default function BuatJanjiTemuDokterPage() {
                                 <Select onValueChange={setSelectedDoctorId}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Pilih dokter yang tersedia" />
-                                    </Trigger>
+                                    </SelectTrigger>
                                     <SelectContent>
                                         {doctors.map(doctor => (
                                             <SelectItem key={doctor.id} value={doctor.id}>
