@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import {
   CalendarPlus,
@@ -46,7 +47,7 @@ export default function PasienDashboardLayout({
             <SidebarMenuItem>
                 <ActiveLink href="/pasien-dashboard/janji-temu">
                     <CalendarPlus />
-                    Janji Temu
+                    Buat Janji Temu
                 </ActiveLink>
             </SidebarMenuItem>
             <SidebarMenuItem>

@@ -24,6 +24,7 @@ import { MoreHorizontal, PlusCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { appointments as allAppointments } from '@/lib/data';
 import { doctors } from '@/lib/data';
+import Link from 'next/link';
 
 const statusVariant = (status: Appointment['status']) => {
   switch (status) {
@@ -49,6 +50,7 @@ export default function Appointments() {
 
   // Filter appointments based on the doctorId from the URL
   const doctor = doctors.find(d => d.id === doctorId);
+  // If doctorId exists, filter appointments. Otherwise (for admin), show all.
   const appointments = doctorId && doctor
     ? allAppointments.filter(app => app.doctorName === doctor.name)
     : allAppointments;
@@ -68,9 +70,11 @@ export default function Appointments() {
             <CardTitle>Manajemen Janji Temu</CardTitle>
             <CardDescription>Kelola semua janji temu yang dijadwalkan.</CardDescription>
         </div>
-        <Button size="sm" className="gap-2" onClick={() => handleAction('Buat Janji Temu')}>
-            <PlusCircle />
-            Buat Janji Temu
+        <Button size="sm" className="gap-2" asChild>
+            <Link href={doctorId ? `/dashboard/janji-temu/baru?doctor=${doctorId}`: `/dashboard/janji-temu/baru`}>
+                <PlusCircle />
+                Buat Janji Temu
+            </Link>
         </Button>
       </CardHeader>
       <CardContent>
