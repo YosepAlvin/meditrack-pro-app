@@ -81,10 +81,11 @@ export default function Appointments() {
   }, [doctorId]);
 
   const handleUpdateStatus = (appointmentId: number, newStatus: Appointment['status']) => {
-    const updatedAppointments = appointments.map(app =>
+    setAppointments(currentAppointments =>
+      currentAppointments.map(app =>
         app.id === appointmentId ? { ...app, status: newStatus } : app
       )
-    setAppointments(updatedAppointments);
+    );
 
     // Update data global juga (simulasi update ke database)
     const globalIndex = allAppointments.findIndex(app => app.id === appointmentId);
@@ -111,9 +112,6 @@ export default function Appointments() {
         return;
     }
 
-    // Tutup dialog terlebih dahulu untuk menghindari freeze
-    setIsPrescriptionDialogOpen(false);
-
     const medIndex = allMedications.findIndex(med => med.id === selectedMedication);
     if (medIndex === -1) return;
 
@@ -121,9 +119,14 @@ export default function Appointments() {
     
     if (medToPrescribe.stock < quantity) {
         toast({ title: "Stok Tidak Cukup!", description: `Stok ${medToPrescribe.name} hanya tersisa ${medToPrescribe.stock}.`, variant: "destructive" });
+        // Jangan tutup dialog jika stok tidak cukup, agar pengguna bisa mengoreksi
         return;
     }
+    
+    // Tutup dialog SEKARANG, sebelum memodifikasi state lain
+    setIsPrescriptionDialogOpen(false);
 
+    // Lanjutkan dengan logika bisnis
     allMedications[medIndex].stock -= quantity;
     handleUpdateStatus(currentPatient.id, 'Selesai');
 
@@ -235,7 +238,7 @@ export default function Appointments() {
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="medication" className="text-right">Obat</Label>
-               <Select onValueChange={setSelectedMedication}>
+               <Select onValueChange={setSelectedMedication} value={selectedMedication}>
                   <SelectTrigger className="col-span-3">
                       <SelectValue placeholder="Pilih obat..." />
                   </SelectTrigger>
