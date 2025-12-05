@@ -20,7 +20,7 @@ export function LoginForm() {
       <CardHeader className="space-y-1 text-left p-0 pb-4">
         <CardTitle className="text-2xl font-headline">Selamat Datang Kembali</CardTitle>
         <CardDescription>
-          Masukkan email Anda di bawah ini untuk masuk ke akun Anda.
+          Pilih peran Anda untuk masuk.
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4 p-0">
@@ -33,9 +33,12 @@ export function LoginForm() {
           <Input id="password" type="password" />
         </div>
       </CardContent>
-      <CardFooter className="p-0 pt-4">
+      <CardFooter className="flex flex-col gap-2 p-0 pt-4">
         <Button className="w-full" asChild>
-          <Link href="/dashboard">Masuk</Link>
+          <Link href="/dashboard">Masuk sebagai Dokter</Link>
+        </Button>
+        <Button variant="outline" className="w-full" asChild>
+          <Link href="/pasien-dashboard">Masuk sebagai Pasien</Link>
         </Button>
       </CardFooter>
     </Card>

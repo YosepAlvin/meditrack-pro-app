@@ -8,15 +8,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs';
 
 import { LoginForm } from '@/components/login-form';
 import { RegisterForm } from '@/components/register-form';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function AuthenticationPage() {
   return (
@@ -34,7 +29,7 @@ export default function AuthenticationPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="login" className="w-full">
+           <Tabs defaultValue="login" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="login">Masuk</TabsTrigger>
               <TabsTrigger value="register">Daftar</TabsTrigger>

@@ -1,11 +1,10 @@
 import Link from "next/link";
 import {
-  BrainCircuit,
-  CalendarDays,
+  CalendarPlus,
+  HeartPulse,
   LayoutDashboard,
-  Pill,
   Rocket,
-  Users,
+  ScrollText,
 } from 'lucide-react';
 import {
   SidebarProvider,
@@ -14,14 +13,13 @@ import {
   SidebarContent,
   SidebarMenu,
   SidebarMenuItem,
-  SidebarMenuButton,
   SidebarFooter,
   SidebarInset,
 } from '@/components/ui/sidebar';
 import Header from "@/components/header";
 import ActiveLink from "@/components/active-link";
 
-export default function DashboardLayout({
+export default function PasienDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -40,33 +38,27 @@ export default function DashboardLayout({
         <SidebarContent>
           <SidebarMenu>
             <SidebarMenuItem>
-                <ActiveLink href="/dashboard">
+                <ActiveLink href="/pasien-dashboard">
                     <LayoutDashboard />
-                    Dasbor Dokter
+                    Dasbor Pasien
                 </ActiveLink>
             </SidebarMenuItem>
             <SidebarMenuItem>
-                <ActiveLink href="/dashboard/janji-temu">
-                    <CalendarDays />
+                <ActiveLink href="/pasien-dashboard/janji-temu">
+                    <CalendarPlus />
                     Janji Temu
                 </ActiveLink>
             </SidebarMenuItem>
             <SidebarMenuItem>
-                <ActiveLink href="/dashboard/pasien">
-                    <Users />
-                    Pasien
+                <ActiveLink href="/pasien-dashboard/riwayat-medis">
+                    <ScrollText />
+                    Riwayat Medis
                 </ActiveLink>
             </SidebarMenuItem>
-            <SidebarMenuItem>
-                <ActiveLink href="/dashboard/obat">
-                    <Pill />
-                    Obat
-                </ActiveLink>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-                <ActiveLink href="/dashboard/dosis-ai">
-                    <BrainCircuit />
-                    Dosis AI
+             <SidebarMenuItem>
+                <ActiveLink href="/pasien-dashboard/kesehatan">
+                    <HeartPulse />
+                    Data Kesehatan
                 </ActiveLink>
             </SidebarMenuItem>
           </SidebarMenu>
@@ -74,7 +66,7 @@ export default function DashboardLayout({
         <SidebarFooter/>
       </Sidebar>
       <SidebarInset>
-        <Header title="Dasbor Dokter" />
+        <Header title="Dasbor Pasien" />
         {children}
       </SidebarInset>
     </SidebarProvider>
