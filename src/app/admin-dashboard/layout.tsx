@@ -52,6 +52,12 @@ export default function AdminDashboardLayout({
                 </ActiveLink>
             </SidebarMenuItem>
             <SidebarMenuItem>
+                <ActiveLink href="/admin-dashboard/manajemen-dokter">
+                    <Stethoscope />
+                    Manajemen Dokter
+                </ActiveLink>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
                 <ActiveLink href="/dashboard/janji-temu">
                     <CalendarDays />
                     Janji Temu
