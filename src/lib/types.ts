@@ -14,13 +14,15 @@ export type Doctor = {
 };
 
 export type Appointment = {
-  id: string;
+  id: number;
   patientName: string;
   doctorName: string;
+  doctorId: string; // Tambahkan doctorId
   clinic: string;
   time: string;
   status: 'Terkonfirmasi' | 'Menunggu' | 'Dibatalkan' | 'Selesai' | 'Dipanggil';
   complaint: string;
+  appointment_date: string;
 };
 
 export type Medication = {

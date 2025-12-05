@@ -12,7 +12,6 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button";
-import { doctors } from "@/lib/data" // Keep for doctor's name
 import type { Appointment } from "@/lib/types"
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
@@ -32,8 +31,7 @@ const statusVariant = (status: Appointment['status']) => {
 
 export default function PatientQueue() {
     const searchParams = useSearchParams();
-    const doctorId = searchParams.get('doctor') || 'dr-wahyu';
-    const doctor = doctors.find(d => d.id === doctorId);
+    const doctorId = searchParams.get('doctor'); // doctorId dari URL
     const { toast } = useToast();
 
     const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -41,10 +39,14 @@ export default function PatientQueue() {
 
     useEffect(() => {
         async function fetchAppointments() {
-            if (!doctor) return;
+            if (!doctorId) {
+                setIsLoading(false);
+                return;
+            };
             setIsLoading(true);
             try {
-                const response = await fetch(`/api/appointments?doctorName=${encodeURIComponent(doctor.name)}`);
+                // Mengirim doctorId ke API
+                const response = await fetch(`/api/appointments?doctorId=${encodeURIComponent(doctorId)}`);
                 if (!response.ok) throw new Error("Gagal mengambil data antrian.");
                 const data = await response.json();
                 setAppointments(data);
@@ -60,9 +62,9 @@ export default function PatientQueue() {
         }
 
         fetchAppointments();
-    }, [doctor, toast]);
+    }, [doctorId, toast]);
 
-    const handleCallPatient = (id: string) => {
+    const handleCallPatient = (id: number) => {
         setAppointments(prev => prev.map(app => {
             if (app.id === id) {
                 return { ...app, status: 'Dipanggil' };
@@ -117,7 +119,7 @@ export default function PatientQueue() {
                 </TableRow>
                 )) : (
                 <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground">Tidak ada pasien dalam antrian.</TableCell>
+                    <TableCell colSpan={5} className="text-center text-muted-foreground">Tidak ada pasien dalam antrian untuk dokter ini.</TableCell>
                 </TableRow>
                 )}
             </TableBody>

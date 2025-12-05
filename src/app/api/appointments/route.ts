@@ -3,7 +3,7 @@ import db from '@/lib/db';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const doctorName = searchParams.get('doctorName');
+  const doctorId = searchParams.get('doctorId'); // Menggunakan doctorId
 
   try {
     // Ambil tanggal hari ini dalam format YYYY-MM-DD
@@ -12,9 +12,10 @@ export async function GET(request: Request) {
     let query = 'SELECT * FROM appointments WHERE status != "Dibatalkan" AND appointment_date = ?';
     const params: string[] = [today];
 
-    if (doctorName) {
-      query += ' AND doctorName = ?';
-      params.push(doctorName);
+    // Filter berdasarkan doctorId jika tersedia
+    if (doctorId) {
+      query += ' AND doctorId = ?';
+      params.push(doctorId);
     }
     
     query += ' ORDER BY time ASC';
