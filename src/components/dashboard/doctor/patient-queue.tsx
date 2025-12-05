@@ -12,7 +12,20 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button";
-import type { Appointment } from "@/lib/types"
+import type { Appointment, Medication } from "@/lib/types"
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogDescription, 
+  DialogFooter 
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+import { medications as allMedications } from '@/lib/data';
 
 // Data statis (mock) untuk janji temu
 const allMockAppointments: Appointment[] = [
@@ -58,17 +71,20 @@ const statusVariant = (status: Appointment['status']) => {
 export default function PatientQueue() {
   const searchParams = useSearchParams();
   const doctorId = searchParams.get('doctor');
+  const { toast } = useToast();
   
-  // Gunakan state untuk mengelola daftar janji temu
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-
+  const [isPrescriptionDialogOpen, setIsPrescriptionDialogOpen] = useState(false);
+  const [currentPatient, setCurrentPatient] = useState<Appointment | null>(null);
+  const [selectedMedication, setSelectedMedication] = useState<string>('');
+  const [quantity, setQuantity] = useState<number>(1);
+  
   // Filter dan set janji temu saat komponen dimuat atau doctorId berubah
   useEffect(() => {
     const filteredAppointments = allMockAppointments.filter(app => app.doctorId === doctorId);
     setAppointments(filteredAppointments);
   }, [doctorId]);
 
-  // Fungsi untuk menangani klik tombol "Mulai Periksa"
   const handleCallPatient = (id: number) => {
     setAppointments(currentAppointments =>
       currentAppointments.map(app =>
@@ -76,8 +92,58 @@ export default function PatientQueue() {
       )
     );
   };
+  
+  const openPrescriptionDialog = (patient: Appointment) => {
+    setCurrentPatient(patient);
+    setSelectedMedication('');
+    setQuantity(1);
+    setIsPrescriptionDialogOpen(true);
+  };
+
+  const handlePrescribe = () => {
+    if (!currentPatient || !selectedMedication || quantity <= 0) {
+        toast({ title: "Error", description: "Pilih obat dan jumlah yang valid.", variant: "destructive" });
+        return;
+    }
+
+    const medIndex = allMedications.findIndex(med => med.id === selectedMedication);
+    if (medIndex === -1) {
+        toast({ title: "Error", description: "Obat tidak ditemukan.", variant: "destructive" });
+        return;
+    }
+
+    const medToPrescribe = allMedications[medIndex];
+    
+    // Validasi stok
+    if (medToPrescribe.stock < quantity) {
+        toast({
+            title: "Stok Tidak Cukup!",
+            description: `Stok ${medToPrescribe.name} hanya tersisa ${medToPrescribe.stock}.`,
+            variant: "destructive",
+        });
+        return;
+    }
+
+    // Kurangi stok (simulasi)
+    allMedications[medIndex].stock -= quantity;
+    
+    // Ubah status pasien menjadi "Selesai"
+    setAppointments(currentAppointments =>
+      currentAppointments.map(app =>
+        app.id === currentPatient.id ? { ...app, status: 'Selesai' } : app
+      )
+    );
+
+    toast({
+        title: "Resep Diberikan!",
+        description: `${quantity} ${medToPrescribe.name} telah diresepkan untuk ${currentPatient.patientName}. Stok diperbarui.`,
+    });
+
+    setIsPrescriptionDialogOpen(false);
+  };
 
   return (
+    <>
     <Card>
       <CardHeader>
         <CardTitle>Antrian Pasien Hari Ini</CardTitle>
@@ -103,7 +169,16 @@ export default function PatientQueue() {
                 <TableCell>
                 <Badge variant={statusVariant(appointment.status)}>{appointment.status}</Badge>
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-right space-x-2">
+                 {appointment.status === 'Dipanggil' && (
+                    <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => openPrescriptionDialog(appointment)}
+                    >
+                        Tulis Resep
+                    </Button>
+                )}
                 <Button 
                     size="sm" 
                     disabled={appointment.status !== 'Menunggu'}
@@ -124,5 +199,44 @@ export default function PatientQueue() {
         </Table>
       </CardContent>
     </Card>
+
+    <Dialog open={isPrescriptionDialogOpen} onOpenChange={setIsPrescriptionDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Tulis Resep untuk {currentPatient?.patientName}</DialogTitle>
+            <DialogDescription>
+              Pilih obat dari daftar dan tentukan jumlahnya. Stok akan otomatis dikurangi.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="medication" className="text-right">Obat</Label>
+               <Select onValueChange={setSelectedMedication}>
+                  <SelectTrigger className="col-span-3">
+                      <SelectValue placeholder="Pilih obat..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                      {allMedications.map(med => (
+                          <SelectItem key={med.id} value={med.id}>
+                              {med.name} ({med.strength}) - Stok: {med.stock}
+                          </SelectItem>
+                      ))}
+                  </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="quantity" className="text-right">Jumlah</Label>
+              <Input id="quantity" name="quantity" type="number" value={quantity} onChange={(e) => setQuantity(Number(e.target.value))} className="col-span-3" min="1"/>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsPrescriptionDialogOpen(false)}>Batal</Button>
+            <Button onClick={handlePrescribe}>Resepkan</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
+
+    
