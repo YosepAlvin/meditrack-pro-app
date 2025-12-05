@@ -43,12 +43,13 @@ export default function BuatJanjiTemuAdminPage() {
             appointment_date: new Date().toISOString().slice(0, 10),
         };
 
-        // Tambahkan janji temu baru ke array
-        appointments.unshift(newAppointment);
+        // PENTING: Jangan mutasi data global.
+        // Di aplikasi nyata, ini akan menjadi panggilan API POST.
+        // appointments.unshift(newAppointment);
 
         toast({
             title: "Janji Temu Dibuat!",
-            description: `Janji temu baru untuk ${selectedDoctor.name} telah ditambahkan.`,
+            description: `Janji temu baru untuk ${selectedDoctor.name} telah disimulasikan. Kembali ke halaman Janji Temu untuk melihatnya.`,
         });
     }
 

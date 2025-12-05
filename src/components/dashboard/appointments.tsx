@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -98,7 +99,10 @@ export default function Appointments() {
   }
 
   const handlePrescribe = () => {
-    // 1. Validate
+    // 1. Close the dialog first to prevent UI freeze
+    setIsPrescriptionDialogOpen(false);
+
+    // 2. Validate
     if (!currentPatient || !selectedMedicationId) return;
     const medication = medications.find(m => m.id === selectedMedicationId);
     if (!medication) {
@@ -109,9 +113,6 @@ export default function Appointments() {
         toast({ title: "Stok Habis!", description: `Stok ${medication.name} tidak mencukupi.`, variant: "destructive" });
         return;
     }
-
-    // 2. Close the dialog first to prevent UI freeze
-    setIsPrescriptionDialogOpen(false);
 
     // 3. Update medication state using functional update
     setMedications(prevMeds =>
