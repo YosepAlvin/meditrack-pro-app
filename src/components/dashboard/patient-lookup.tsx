@@ -5,11 +5,15 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { patients } from "@/lib/data"
-import { Search } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { patients as initialPatients } from "@/lib/data"
+import type { Patient } from "@/lib/types";
+import { Search, MoreHorizontal, PlusCircle } from "lucide-react"
 
 export default function PatientLookup() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [patients, setPatients] = useState<Patient[]>(initialPatients);
 
   const filteredPatients = patients.filter((patient) =>
     patient.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -17,9 +21,15 @@ export default function PatientLookup() {
 
   return (
     <Card className="shadow-md">
-      <CardHeader>
-        <CardTitle>Rekam Medis Pasien</CardTitle>
-        <CardDescription>Cari dan lihat riwayat pasien.</CardDescription>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+            <CardTitle>Manajemen Pasien</CardTitle>
+            <CardDescription>Cari, tambah, dan kelola data pasien.</CardDescription>
+        </div>
+         <Button size="sm" className="gap-2">
+            <PlusCircle />
+            Tambah Pasien
+        </Button>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <div className="relative">
@@ -31,7 +41,7 @@ export default function PatientLookup() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <ScrollArea className="h-64">
+        <ScrollArea className="h-[350px]">
           <div className="space-y-4 pr-4">
             {filteredPatients.map((patient) => (
               <div key={patient.id} className="flex items-center gap-4 p-2 rounded-lg hover:bg-secondary">
@@ -39,10 +49,22 @@ export default function PatientLookup() {
                   <AvatarImage src={patient.avatarUrl} alt={patient.name} data-ai-hint="person portrait" />
                   <AvatarFallback>{patient.name.charAt(0)}</AvatarFallback>
                 </Avatar>
-                <div className="grid gap-1">
+                <div className="grid gap-1 flex-1">
                   <p className="text-sm font-medium leading-none">{patient.name}</p>
                   <p className="text-sm text-muted-foreground">{patient.email}</p>
                 </div>
+                 <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0">
+                        <span className="sr-only">Buka menu</span>
+                        <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                    <DropdownMenuItem>Edit</DropdownMenuItem>
+                    <DropdownMenuItem className="text-destructive hover:text-destructive">Hapus</DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             ))}
           </div>

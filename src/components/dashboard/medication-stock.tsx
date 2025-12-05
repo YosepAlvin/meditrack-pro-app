@@ -12,9 +12,10 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { medications as initialMedications } from "@/lib/data"
 import type { Medication } from "@/lib/types";
-import { PlusCircle, MinusCircle } from "lucide-react"
+import { PlusCircle, MoreHorizontal } from "lucide-react"
 
 export default function MedicationStock() {
   const [medications, setMedications] = useState<Medication[]>(initialMedications);
@@ -31,9 +32,15 @@ export default function MedicationStock() {
 
   return (
     <Card className="shadow-md">
-      <CardHeader>
-        <CardTitle>Stok Obat</CardTitle>
-        <CardDescription>Kelola dan pantau inventaris obat.</CardDescription>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+            <CardTitle>Stok Obat</CardTitle>
+            <CardDescription>Kelola dan pantau inventaris obat.</CardDescription>
+        </div>
+        <Button size="sm" className="gap-2">
+            <PlusCircle />
+            Tambah Obat
+        </Button>
       </CardHeader>
       <CardContent>
         <Table>
@@ -52,20 +59,28 @@ export default function MedicationStock() {
                   <div className="text-xs text-muted-foreground">{med.strength}</div>
                 </TableCell>
                 <TableCell>
-                  {med.stock <= med.lowStockThreshold ? (
-                    <Badge variant="destructive">Stok Rendah</Badge>
-                  ) : null}
-                  <span className="ml-2">{med.stock}</span>
+                   <Badge variant={med.stock <= med.lowStockThreshold ? "destructive" : "outline"}>
+                    {med.stock}
+                  </Badge>
+                  {med.stock <= med.lowStockThreshold && 
+                    <p className="text-xs text-destructive mt-1">Stok Rendah</p>
+                  }
                 </TableCell>
                 <TableCell className="text-right space-x-2">
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleStockChange(med.id, -1)}>
-                    <MinusCircle className="h-4 w-4" />
-                    <span className="sr-only">Kurangi stok</span>
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleStockChange(med.id, 1)}>
-                    <PlusCircle className="h-4 w-4" />
-                    <span className="sr-only">Tambah stok</span>
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="h-8 w-8 p-0">
+                        <span className="sr-only">Buka menu</span>
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleStockChange(med.id, 10)}>Tambah 10</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleStockChange(med.id, -10)}>Kurangi 10</DropdownMenuItem>
+                      <DropdownMenuItem>Edit</DropdownMenuItem>
+                      <DropdownMenuItem className="text-destructive hover:text-destructive">Hapus</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </TableCell>
               </TableRow>
             ))}
