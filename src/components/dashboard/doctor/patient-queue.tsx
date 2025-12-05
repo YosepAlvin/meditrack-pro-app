@@ -1,4 +1,5 @@
 "use client";
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
   Table,
@@ -55,15 +56,26 @@ const statusVariant = (status: Appointment['status']) => {
 }
 
 export default function PatientQueue() {
-    const searchParams = useSearchParams();
-    const doctorId = searchParams.get('doctor');
+  const searchParams = useSearchParams();
+  const doctorId = searchParams.get('doctor');
+  
+  // Gunakan state untuk mengelola daftar janji temu
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
 
-    // Filter appointments based on the doctorId from the URL
-    const appointments = allMockAppointments.filter(app => app.doctorId === doctorId);
+  // Filter dan set janji temu saat komponen dimuat atau doctorId berubah
+  useEffect(() => {
+    const filteredAppointments = allMockAppointments.filter(app => app.doctorId === doctorId);
+    setAppointments(filteredAppointments);
+  }, [doctorId]);
 
-    // Untuk demo, kita tidak perlu state karena datanya statis
-    // const [appointments, setAppointments] = useState<Appointment[]>(initialAppointments);
-    // const handleCallPatient = (id: number) => { ... };
+  // Fungsi untuk menangani klik tombol "Mulai Periksa"
+  const handleCallPatient = (id: number) => {
+    setAppointments(currentAppointments =>
+      currentAppointments.map(app =>
+        app.id === id ? { ...app, status: 'Dipanggil' } : app
+      )
+    );
+  };
 
   return (
     <Card>
@@ -95,7 +107,7 @@ export default function PatientQueue() {
                 <Button 
                     size="sm" 
                     disabled={appointment.status !== 'Menunggu'}
-                    // onClick={() => handleCallPatient(appointment.id)}
+                    onClick={() => handleCallPatient(appointment.id)}
                 >
                     Mulai Periksa
                 </Button>
