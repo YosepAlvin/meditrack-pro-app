@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
   Table,
@@ -48,18 +49,39 @@ export default function Appointments() {
   const searchParams = useSearchParams();
   const doctorId = searchParams.get('doctor');
 
-  // Filter appointments based on the doctorId from the URL
+  // Filter initial appointments based on the doctorId
   const doctor = doctors.find(d => d.id === doctorId);
-  // If doctorId exists, filter appointments. Otherwise (for admin), show all.
-  const appointments = doctorId && doctor
+  const initialAppointments = doctorId && doctor
     ? allAppointments.filter(app => app.doctorName === doctor.name)
     : allAppointments;
 
+  const [appointments, setAppointments] = useState<Appointment[]>(initialAppointments);
+  
+  // Update state if the underlying data changes (e.g., after creating a new one)
+  useEffect(() => {
+    const updatedAppointments = doctorId && doctor
+        ? allAppointments.filter(app => app.doctorName === doctor.name)
+        : allAppointments;
+    setAppointments(updatedAppointments);
+  }, [allAppointments, doctorId, doctor]);
 
-  const handleAction = (action: string) => {
+
+  const handleUpdateStatus = (appointmentId: number, newStatus: Appointment['status']) => {
+    setAppointments(currentAppointments =>
+      currentAppointments.map(app =>
+        app.id === appointmentId ? { ...app, status: newStatus } : app
+      )
+    );
+    
+    // Also update the global `allAppointments` array for session consistency
+    const appointmentIndex = allAppointments.findIndex(app => app.id === appointmentId);
+    if(appointmentIndex !== -1) {
+        allAppointments[appointmentIndex].status = newStatus;
+    }
+
     toast({
-      title: "Aksi Dicatat",
-      description: `Tombol "${action}" telah diklik. Fungsionalitas penuh akan segera hadir.`,
+      title: "Status Diperbarui",
+      description: `Janji temu telah ${newStatus === 'Terkonfirmasi' ? 'dikonfirmasi' : 'dibatalkan'}.`,
     });
   };
 
@@ -71,7 +93,7 @@ export default function Appointments() {
             <CardDescription>Kelola semua janji temu yang dijadwalkan.</CardDescription>
         </div>
         <Button size="sm" className="gap-2" asChild>
-            <Link href={doctorId ? `/dashboard/janji-temu/baru?doctor=${doctorId}`: `/dashboard/janji-temu/baru`}>
+            <Link href={doctorId ? `/dashboard/janji-temu/baru?doctor=${doctorId}`: `/admin-dashboard/janji-temu/baru`}>
                 <PlusCircle />
                 Buat Janji Temu
             </Link>
@@ -108,8 +130,19 @@ export default function Appointments() {
                           </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleAction('Edit')}>Edit</DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleAction('Batalkan')}>Batalkan</DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => handleUpdateStatus(appointment.id, 'Terkonfirmasi')}
+                            disabled={appointment.status !== 'Menunggu'}
+                          >
+                            Konfirmasi
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            className="text-destructive focus:text-destructive"
+                            onClick={() => handleUpdateStatus(appointment.id, 'Dibatalkan')}
+                            disabled={appointment.status === 'Dibatalkan' || appointment.status === 'Selesai'}
+                          >
+                            Batalkan
+                          </DropdownMenuItem>
                           </DropdownMenuContent>
                       </DropdownMenu>
                   </TableCell>
