@@ -1,23 +1,89 @@
-import Overview from "@/components/dashboard/overview";
-import Appointments from "@/components/dashboard/appointments";
-import PatientLookup from "@/components/dashboard/patient-lookup";
-import MedicationStock from "@/components/dashboard/medication-stock";
-import DosageSuggester from "@/components/dashboard/dosage-suggester";
+import {
+  Activity,
+  PlusCircle,
+  BookUser,
+  CalendarClock,
+  ClipboardPlus,
+  Users,
+  Pill,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import DoctorProfile from '@/components/dashboard/doctor/doctor-profile';
+import PracticeSchedule from '@/components/dashboard/doctor/practice-schedule';
+import PatientQueue from '@/components/dashboard/doctor/patient-queue';
+import RecentMedicalRecords from '@/components/dashboard/doctor/recent-medical-records';
+
+function QuickActions() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg">Akses Cepat</CardTitle>
+      </CardHeader>
+      <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-2">
+        <Button variant="outline" className="flex-col h-auto">
+          <ClipboardPlus className="mb-2" />
+          <span>Tambah Rekam Medis</span>
+        </Button>
+        <Button variant="outline" className="flex-col h-auto">
+          <Pill className="mb-2" />
+          <span>Tulis Resep</span>
+        </Button>
+        <Button variant="outline" className="flex-col h-auto">
+          <CalendarClock className="mb-2" />
+          <span>Lihat Jadwal</span>
+        </Button>
+        <Button variant="outline" className="flex-col h-auto">
+          <BookUser className="mb-2" />
+          <span>Cari Pasien</span>
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
+function MiniAnalytics() {
+    return (
+         <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Pasien Hari Ini</CardTitle>
+                <Users className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">12</div>
+                <p className="text-xs text-muted-foreground">2 pasien telah selesai</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Resep Dibuat</CardTitle>
+                <Activity className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">8</div>
+                 <p className="text-xs text-muted-foreground">Total resep hari ini</p>
+              </CardContent>
+            </Card>
+          </div>
+    )
+}
 
 export default function DashboardPage() {
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
-      <div className="grid gap-4 md:grid-cols-3 md:gap-8">
-        <Overview />
-      </div>
-      <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
-        <div className="xl:col-span-2 space-y-4">
-            <Appointments />
-            <DosageSuggester />
+      <div className="grid gap-4 md:gap-8 lg:grid-cols-3">
+        {/* Kolom Kiri */}
+        <div className="lg:col-span-2 space-y-4">
+          <PracticeSchedule />
+          <PatientQueue />
         </div>
+        {/* Kolom Kanan */}
         <div className="space-y-4">
-            <PatientLookup />
-            <MedicationStock />
+          <DoctorProfile />
+          <QuickActions />
+          <MiniAnalytics />
+          <RecentMedicalRecords />
         </div>
       </div>
     </main>

@@ -17,7 +17,8 @@ export type Appointment = {
   doctorName: string;
   clinic: string;
   time: string;
-  status: 'Terkonfirmasi' | 'Menunggu' | 'Dibatalkan';
+  status: 'Terkonfirmasi' | 'Menunggu' | 'Dibatalkan' | 'Selesai' | 'Dipanggil';
+  complaint: string;
 };
 
 export type Medication = {
@@ -27,3 +28,20 @@ export type Medication = {
   stock: number;
   lowStockThreshold: number;
 };
+
+export type MedicalRecord = {
+    id: string;
+    patientName: string;
+    date: string;
+    diagnosis: string;
+    prescription: string;
+};
+
+export type PracticeSchedule = {
+    id: string;
+    startTime: string;
+    endTime: string;
+    clinic: string;
+    room: string;
+    status: 'Sedang Berlangsung' | 'Selesai' | 'Belum Mulai';
+}

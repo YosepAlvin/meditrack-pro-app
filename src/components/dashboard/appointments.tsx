@@ -19,12 +19,18 @@ const statusVariant = (status: Appointment['status']) => {
       return 'secondary';
     case 'Dibatalkan':
       return 'destructive';
+    case 'Selesai':
+        return 'outline';
+    case 'Dipanggil':
+        return 'default'; // Or another color
     default:
       return 'outline';
   }
 }
 
 export default function Appointments() {
+  const todaysAppointments = appointments.filter(a => a.status !== 'Dibatalkan');
+
   return (
     <Card className="shadow-md">
       <CardHeader>
@@ -43,7 +49,7 @@ export default function Appointments() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {appointments.map((appointment) => (
+            {todaysAppointments.map((appointment) => (
               <TableRow key={appointment.id}>
                 <TableCell className="font-medium">{appointment.patientName}</TableCell>
                 <TableCell>{appointment.doctorName}</TableCell>
