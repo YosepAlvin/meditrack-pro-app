@@ -57,7 +57,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                 <ActiveLink href="/dashboard/obat">
                     <Pill />
                     Obat
-                </AgedLink>
+                </ActiveLink>
             </SidebarMenuItem>
             <SidebarMenuItem>
                 <ActiveLink href="/dashboard/dosis-ai">
