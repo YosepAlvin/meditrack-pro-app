@@ -28,6 +28,14 @@ export let appointments: Appointment[] = [
 export let medications: Medication[] = [
   { id: '1', name: 'Parasetamol', strength: '500mg', stock: 150, lowStockThreshold: 50 },
   { id: '2', name: 'Amoksisilin', strength: '250mg', stock: 80, lowStockThreshold: 30 },
+  { id: '3', name: 'Aspirin', strength: '80mg', stock: 200, lowStockThreshold: 50 },
+  { id: '4', name: 'Ibuprofen', strength: '400mg', stock: 120, lowStockThreshold: 40 },
+  { id: '5', name: 'Metformin', strength: '500mg', stock: 100, lowStockThreshold: 30 },
+  { id: '6', name: 'Lisinopril', strength: '10mg', stock: 75, lowStockThreshold: 25 },
+  { id: '7', name: 'Amlodipine', strength: '5mg', stock: 90, lowStockThreshold: 30 },
+  { id: '8', name: 'Simvastatin', strength: '20mg', stock: 110, lowStockThreshold: 40 },
+  { id: '9', name: 'Omeprazole', strength: '20mg', stock: 60, lowStockThreshold: 20 },
+  { id: '10', name: 'Cefixime', strength: '100mg', stock: 50, lowStockThreshold: 20 },
 ];
 
 export let medicalRecords: MedicalRecord[] = [
