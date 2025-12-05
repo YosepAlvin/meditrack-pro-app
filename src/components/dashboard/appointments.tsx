@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -21,6 +22,7 @@ import {
 import { appointments as initialAppointments } from "@/lib/data"
 import type { Appointment } from "@/lib/types"
 import { MoreHorizontal, PlusCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const statusVariant = (status: Appointment['status']) => {
   switch (status) {
@@ -42,6 +44,14 @@ const statusVariant = (status: Appointment['status']) => {
 export default function Appointments() {
   const [appointments, setAppointments] = useState<Appointment[]>(initialAppointments);
   const todaysAppointments = appointments.filter(a => a.status !== 'Dibatalkan');
+  const { toast } = useToast();
+
+  const handleAction = (action: string) => {
+    toast({
+      title: "Aksi Dicatat",
+      description: `Tombol "${action}" telah diklik. Fungsionalitas penuh akan segera hadir.`,
+    });
+  };
 
   return (
     <Card className="shadow-md">
@@ -50,7 +60,7 @@ export default function Appointments() {
             <CardTitle>Manajemen Janji Temu</CardTitle>
             <CardDescription>Kelola semua janji temu yang dijadwalkan.</CardDescription>
         </div>
-        <Button size="sm" className="gap-2">
+        <Button size="sm" className="gap-2" onClick={() => handleAction('Buat Janji Temu')}>
             <PlusCircle />
             Buat Janji Temu
         </Button>
@@ -86,8 +96,8 @@ export default function Appointments() {
                         </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                        <DropdownMenuItem>Batalkan</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleAction('Edit')}>Edit</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleAction('Batalkan')}>Batalkan</DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </TableCell>

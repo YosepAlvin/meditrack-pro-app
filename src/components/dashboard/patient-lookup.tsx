@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -10,14 +11,68 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { patients as initialPatients } from "@/lib/data"
 import type { Patient } from "@/lib/types";
 import { Search, MoreHorizontal, PlusCircle } from "lucide-react"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label";
 
 export default function PatientLookup() {
   const [searchTerm, setSearchTerm] = useState("");
   const [patients, setPatients] = useState<Patient[]>(initialPatients);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
+  const [newPatient, setNewPatient] = useState({ name: '', email: '', avatarUrl: '' });
+
 
   const filteredPatients = patients.filter((patient) =>
     patient.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const openAddDialog = () => {
+    setEditingPatient(null);
+    setNewPatient({ name: '', email: '', avatarUrl: `https://picsum.photos/seed/${Date.now()}/40/40` });
+    setIsDialogOpen(true);
+  }
+
+  const openEditDialog = (patient: Patient) => {
+    setEditingPatient(patient);
+    setNewPatient({ name: patient.name, email: patient.email, avatarUrl: patient.avatarUrl });
+    setIsDialogOpen(true);
+  };
+
+  const closeDialog = () => {
+    setIsDialogOpen(false);
+    setEditingPatient(null);
+  };
+
+  const handleSavePatient = () => {
+    if (editingPatient) {
+      setPatients(pats => pats.map(p => p.id === editingPatient.id ? { ...editingPatient, ...newPatient } : p));
+    } else {
+      const patientToAdd: Patient = {
+        id: `pat-${Date.now()}`,
+        lastVisit: new Date().toISOString().split('T')[0],
+        ...newPatient
+      };
+      setPatients(pats => [patientToAdd, ...pats]);
+    }
+    closeDialog();
+  };
+
+  const handleDeletePatient = (id: string) => {
+    setPatients(pats => pats.filter(p => p.id !== id));
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setNewPatient(prev => ({ ...prev, [name]: value }));
+  };
+
 
   return (
     <Card className="shadow-md">
@@ -26,7 +81,7 @@ export default function PatientLookup() {
             <CardTitle>Manajemen Pasien</CardTitle>
             <CardDescription>Cari, tambah, dan kelola data pasien.</CardDescription>
         </div>
-         <Button size="sm" className="gap-2">
+         <Button size="sm" className="gap-2" onClick={openAddDialog}>
             <PlusCircle />
             Tambah Pasien
         </Button>
@@ -61,8 +116,8 @@ export default function PatientLookup() {
                     </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                    <DropdownMenuItem>Edit</DropdownMenuItem>
-                    <DropdownMenuItem className="text-destructive hover:text-destructive">Hapus</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => openEditDialog(patient)}>Edit</DropdownMenuItem>
+                    <DropdownMenuItem className="text-destructive hover:text-destructive" onClick={() => handleDeletePatient(patient.id)}>Hapus</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -70,6 +125,30 @@ export default function PatientLookup() {
           </div>
         </ScrollArea>
       </CardContent>
+       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>{editingPatient ? 'Edit Pasien' : 'Tambah Pasien Baru'}</DialogTitle>
+                    <DialogDescription>
+                        {editingPatient ? 'Ubah detail pasien di bawah ini.' : 'Isi detail pasien baru di bawah ini.'}
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="name" className="text-right">Nama</Label>
+                        <Input id="name" name="name" value={newPatient.name} onChange={handleInputChange} className="col-span-3" />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="email" className="text-right">Email</Label>
+                        <Input id="email" name="email" type="email" value={newPatient.email} onChange={handleInputChange} className="col-span-3" />
+                    </div>
+                </div>
+                <DialogFooter>
+                    <Button variant="outline" onClick={closeDialog}>Batal</Button>
+                    <Button onClick={handleSavePatient}>Simpan</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     </Card>
   )
 }

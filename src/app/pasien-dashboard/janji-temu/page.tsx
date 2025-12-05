@@ -1,11 +1,24 @@
+
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 
 export default function BuatJanjiTemuPage() {
+    const { toast } = useToast();
+
+    const handleCreateAppointment = () => {
+        toast({
+            title: "Janji Temu Dibuat!",
+            description: "Anda akan menerima notifikasi jika telah dikonfirmasi.",
+        });
+    }
+
     return (
         <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
             <Card>
@@ -55,7 +68,7 @@ export default function BuatJanjiTemuPage() {
                             />
                         </div>
                     </div>
-                     <Button className="w-full md:w-auto">Buat Janji Temu</Button>
+                     <Button className="w-full md:w-auto" onClick={handleCreateAppointment}>Buat Janji Temu</Button>
                 </CardContent>
             </Card>
         </main>

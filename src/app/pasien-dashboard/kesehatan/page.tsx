@@ -1,9 +1,22 @@
+
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 export default function DataKesehatanPage() {
+    const { toast } = useToast();
+
+    const handleSaveChanges = () => {
+        toast({
+            title: "Data Disimpan",
+            description: "Data kesehatan Anda berhasil diperbarui.",
+        });
+    }
+
     return (
         <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
             <Card>
@@ -38,7 +51,7 @@ export default function DataKesehatanPage() {
                             <Input id="allergies" placeholder="Penisilin, Kacang" />
                         </div>
                     </div>
-                    <Button>Simpan Perubahan</Button>
+                    <Button onClick={handleSaveChanges}>Simpan Perubahan</Button>
                 </CardContent>
             </Card>
         </main>

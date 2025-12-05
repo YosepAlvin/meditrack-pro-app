@@ -1,3 +1,6 @@
+
+"use client";
+
 import {
   Table,
   TableBody,
@@ -9,6 +12,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 const users = [
     { id: '1', name: 'Dr. Wahyu', email: 'dr.wahyu@example.com', role: 'Dokter' },
@@ -19,6 +23,15 @@ const users = [
 ];
 
 export default function ManajemenPenggunaPage() {
+    const { toast } = useToast();
+
+    const handleEdit = () => {
+        toast({
+            title: "Fitur Dalam Pengembangan",
+            description: "Kemampuan untuk mengedit pengguna akan segera tersedia.",
+        });
+    }
+
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
         <Card>
@@ -47,7 +60,7 @@ export default function ManajemenPenggunaPage() {
                         </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                        <Button variant="outline" size="sm">Edit</Button>
+                        <Button variant="outline" size="sm" onClick={handleEdit}>Edit</Button>
                     </TableCell>
                 </TableRow>
                 ))}
