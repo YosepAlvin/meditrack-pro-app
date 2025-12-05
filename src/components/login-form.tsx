@@ -35,6 +35,9 @@ export function LoginForm() {
       </CardContent>
       <CardFooter className="flex flex-col gap-2 p-0 pt-4">
         <Button className="w-full" asChild>
+          <Link href="/admin-dashboard">Masuk sebagai Admin</Link>
+        </Button>
+        <Button className="w-full" asChild>
           <Link href="/dashboard">Masuk sebagai Dokter</Link>
         </Button>
         <Button variant="outline" className="w-full" asChild>

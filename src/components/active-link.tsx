@@ -6,7 +6,8 @@ import { SidebarMenuButton } from "@/components/ui/sidebar";
 
 export default function ActiveLink({ href, children }: { href: string, children: React.ReactNode }) {
     const pathname = usePathname();
-    const isActive = pathname === href;
+    const isActive = pathname === href || (href.startsWith('/dashboard') && pathname.startsWith(href));
+
 
     return (
         <SidebarMenuButton href={href} asChild isActive={isActive}>

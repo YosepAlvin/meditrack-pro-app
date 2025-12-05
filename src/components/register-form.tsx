@@ -16,6 +16,19 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useState } from 'react';
 
+const getLinkByRole = (role: string) => {
+    switch(role) {
+        case 'dokter':
+            return '/dashboard';
+        case 'pasien':
+            return '/pasien-dashboard';
+        case 'admin':
+            return '/admin-dashboard';
+        default:
+            return '/';
+    }
+}
+
 export function RegisterForm() {
     const [role, setRole] = useState('pasien');
 
@@ -51,12 +64,16 @@ export function RegisterForm() {
               <RadioGroupItem value="dokter" id="r-dokter" />
               <Label htmlFor="r-dokter">Dokter</Label>
             </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="admin" id="r-admin" />
+              <Label htmlFor="r-admin">Admin</Label>
+            </div>
           </RadioGroup>
         </div>
       </CardContent>
       <CardFooter className="p-0 pt-4">
         <Button className="w-full" asChild>
-          <Link href={role === 'dokter' ? '/dashboard' : '/pasien-dashboard'}>Buat Akun</Link>
+          <Link href={getLinkByRole(role)}>Buat Akun</Link>
         </Button>
       </CardFooter>
     </Card>

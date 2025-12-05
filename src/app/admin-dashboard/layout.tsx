@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   Pill,
   Rocket,
+  ShieldCheck,
   Users,
 } from 'lucide-react';
 import {
@@ -20,7 +21,7 @@ import {
 import Header from "@/components/header";
 import ActiveLink from "@/components/active-link";
 
-export default function DashboardLayout({
+export default function AdminDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -39,9 +40,15 @@ export default function DashboardLayout({
         <SidebarContent>
           <SidebarMenu>
             <SidebarMenuItem>
-                <ActiveLink href="/dashboard">
+                <ActiveLink href="/admin-dashboard">
                     <LayoutDashboard />
-                    Dasbor Dokter
+                    Dasbor Admin
+                </ActiveLink>
+            </SidebarMenuItem>
+             <SidebarMenuItem>
+                <ActiveLink href="/admin-dashboard/manajemen-pengguna">
+                    <ShieldCheck />
+                    Manajemen Pengguna
                 </ActiveLink>
             </SidebarMenuItem>
             <SidebarMenuItem>
@@ -73,7 +80,7 @@ export default function DashboardLayout({
         <SidebarFooter/>
       </Sidebar>
       <SidebarInset>
-        <Header title="Dasbor Dokter" />
+        <Header title="Dasbor Admin" />
         {children}
       </SidebarInset>
     </SidebarProvider>
