@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
-import { doctors, appointments } from "@/lib/data"; // Import data
+import { doctors } from "@/lib/data"; // Import data
 
 export default function BuatJanjiTemuAdminPage() {
     const { toast } = useToast();
@@ -30,10 +30,11 @@ export default function BuatJanjiTemuAdminPage() {
         const selectedDoctor = doctors.find(d => d.id === selectedDoctorId);
         if (!selectedDoctor) return;
 
-        // Buat janji temu baru
+        // Simulasi pembuatan janji temu baru.
+        // Di aplikasi nyata, ini akan menjadi panggilan API.
         const newAppointment = {
-            id: appointments.length + 200, // ID sementara yang unik
-            patientName: "Pasien Baru", // Hardcoded untuk demo
+            id: Math.random() * 1000,
+            patientName: "Pasien Baru (dari Admin)",
             doctorName: selectedDoctor.name,
             doctorId: selectedDoctor.id,
             clinic: selectedDoctor.specialty,
@@ -43,13 +44,9 @@ export default function BuatJanjiTemuAdminPage() {
             appointment_date: new Date().toISOString().slice(0, 10),
         };
 
-        // PENTING: Jangan mutasi data global.
-        // Di aplikasi nyata, ini akan menjadi panggilan API POST.
-        // appointments.unshift(newAppointment);
-
         toast({
             title: "Janji Temu Dibuat!",
-            description: `Janji temu baru untuk ${selectedDoctor.name} telah disimulasikan. Kembali ke halaman Janji Temu untuk melihatnya.`,
+            description: `Janji temu baru untuk ${selectedDoctor.name} telah disimulasikan.`,
         });
     }
 
@@ -87,7 +84,7 @@ export default function BuatJanjiTemuAdminPage() {
                                 <Select onValueChange={setSelectedDoctorId}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Pilih dokter yang tersedia" />
-                                    </Trigger>
+                                    </SelectTrigger>
                                     <SelectContent>
                                         {doctors.map(doctor => (
                                             <SelectItem key={doctor.id} value={doctor.id}>

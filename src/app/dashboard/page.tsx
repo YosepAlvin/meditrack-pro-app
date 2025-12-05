@@ -98,62 +98,13 @@ function MiniAnalytics() {
 }
 
 export default function DashboardPage() {
-  const searchParams = useSearchParams();
-  const doctorId = searchParams.get('doctor');
-
-  // Lifted state
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [medications, setMedications] = useState<Medication[]>([]);
-
-  // Initialize state from mock data
-  useEffect(() => {
-    // Deep copy to prevent direct mutation
-    const allData = JSON.parse(JSON.stringify(mockAppointments));
-    const filteredAppointments = doctorId 
-      ? allData.filter((app: Appointment) => app.doctorId === doctorId)
-      : allData;
-    setAppointments(filteredAppointments);
-    setMedications(JSON.parse(JSON.stringify(mockMedications)));
-  }, [doctorId]);
-
-
-  const handleUpdateAppointmentStatus = (appointmentId: number, newStatus: Appointment['status']) => {
-    setAppointments(prevApps =>
-      prevApps.map(app =>
-        app.id === appointmentId ? { ...app, status: newStatus } : app
-      )
-    );
-  };
-
-  const handlePrescribeAndUpdate = (appointmentId: number, medicationId: string, quantity: number) => {
-    // Update medication stock
-    setMedications(prevMeds =>
-      prevMeds.map(med =>
-        med.id === medicationId ? { ...med, stock: med.stock - quantity } : med
-      )
-    );
-
-    // Update appointment status
-    setAppointments(prevApps =>
-      prevApps.map(app =>
-        app.id === appointmentId ? { ...app, status: 'Selesai' } : app
-      )
-    );
-  };
-
-
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
       <div className="grid gap-4 md:gap-8 lg:grid-cols-3">
         {/* Kolom Kiri */}
         <div className="lg:col-span-2 space-y-4">
           <PracticeSchedule />
-          <Appointments 
-             appointments={appointments}
-             medications={medications}
-             onUpdateStatus={handleUpdateAppointmentStatus}
-             onPrescribe={handlePrescribeAndUpdate}
-          />
+          <Appointments />
         </div>
         {/* Kolom Kanan */}
         <div className="space-y-4">

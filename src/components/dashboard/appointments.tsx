@@ -33,6 +33,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { Appointment, Medication } from "@/lib/types"
+import { appointments as mockAppointments, medications as mockMedications } from '@/lib/data';
 import { MoreHorizontal, PlusCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Link from 'next/link';
@@ -54,18 +55,13 @@ const statusVariant = (status: Appointment['status']) => {
   }
 }
 
-type AppointmentsProps = {
-    appointments: Appointment[];
-    medications: Medication[];
-    onUpdateStatus: (appointmentId: number, newStatus: Appointment['status']) => void;
-    onPrescribe: (appointmentId: number, medicationId: string, quantity: number) => void;
-}
-
-export default function Appointments({ appointments, medications, onUpdateStatus, onPrescribe }: AppointmentsProps) {
+export default function Appointments() {
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const doctorId = searchParams.get('doctor');
   
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [medications, setMedications] = useState<Medication[]>(mockMedications);
   const [isLoading, setIsLoading] = useState(true);
   const [isPrescriptionDialogOpen, setIsPrescriptionDialogOpen] = useState(false);
   const [currentPatient, setCurrentPatient] = useState<Appointment | null>(null);
@@ -73,12 +69,22 @@ export default function Appointments({ appointments, medications, onUpdateStatus
   const [prescriptionQuantity, setPrescriptionQuantity] = useState(1);
   
   useEffect(() => {
-    // Loading is now managed by the parent, but we can keep this for visual feedback if needed
-    setIsLoading(appointments.length === 0 && !doctorId);
-  }, [appointments, doctorId]);
+    setIsLoading(true);
+    // Salinan mendalam untuk memastikan state terisolasi
+    const allAppointments = JSON.parse(JSON.stringify(mockAppointments));
+    const filtered = doctorId
+      ? allAppointments.filter((app: Appointment) => app.doctorId === doctorId)
+      : allAppointments;
+    setAppointments(filtered);
+    setIsLoading(false);
+  }, [doctorId]);
 
   const handleUpdateStatus = (appointmentId: number, newStatus: Appointment['status']) => {
-    onUpdateStatus(appointmentId, newStatus);
+     setAppointments(prevApps =>
+      prevApps.map(app =>
+        app.id === appointmentId ? { ...app, status: newStatus } : app
+      )
+    );
     toast({
       title: "Status Diperbarui",
       description: `Status janji temu telah diubah menjadi ${newStatus}.`,
@@ -93,12 +99,8 @@ export default function Appointments({ appointments, medications, onUpdateStatus
   }
 
   const handlePrescribe = () => {
-    // 1. Close the dialog first to prevent any UI lock
-    setIsPrescriptionDialogOpen(false);
-
-    // 2. Validate
     if (!currentPatient || !selectedMedicationId) return;
-    
+
     const medication = medications.find(m => m.id === selectedMedicationId);
     if (!medication) {
         toast({ title: "Error", description: "Obat tidak ditemukan.", variant: "destructive" });
@@ -109,16 +111,30 @@ export default function Appointments({ appointments, medications, onUpdateStatus
         return;
     }
 
-    // 3. Call parent function to update state
-    onPrescribe(currentPatient.id, selectedMedicationId, prescriptionQuantity);
+    // 1. Update state untuk janji temu menjadi 'Selesai'
+    setAppointments(prevApps =>
+        prevApps.map(app =>
+            app.id === currentPatient.id ? { ...app, status: 'Selesai' } : app
+        )
+    );
+
+    // 2. Update state untuk stok obat
+    setMedications(prevMeds =>
+        prevMeds.map(med =>
+            med.id === selectedMedicationId ? { ...med, stock: Math.max(0, med.stock - prescriptionQuantity) } : med
+        )
+    );
     
-    // 4. Show notification after state updates are queued
+    // 3. Tutup dialog
+    setIsPrescriptionDialogOpen(false);
+
+    // 4. Tampilkan notifikasi
     toast({
         title: "Resep Diberikan!",
         description: `${prescriptionQuantity} unit ${medication.name} diresepkan untuk ${currentPatient.patientName}. Status pasien: Selesai.`,
     });
 
-    // 5. Reset dialog state
+    // 5. Reset state dialog
     setCurrentPatient(null);
     setSelectedMedicationId(null);
     setPrescriptionQuantity(1);

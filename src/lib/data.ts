@@ -3,19 +3,19 @@ import type { Patient, Appointment, Medication, MedicalRecord, PracticeSchedule,
 // Data ini sekarang hanya digunakan untuk tampilan awal atau fallback.
 // Data utama akan diambil dari database melalui API.
 
-export let doctors: Doctor[] = [
+export const doctors: Doctor[] = [
   { id: 'dr-wahyu', name: 'Dr. Wahyu', specialty: 'Spesialis Kardiologi', avatarUrl: 'https://picsum.photos/seed/101/100/100' },
   { id: 'dr-indah', name: 'Dr. Indah', specialty: 'Spesialis Neurologi', avatarUrl: 'https://picsum.photos/seed/102/100/100' },
   { id: 'dr-gunawan', name: 'Dr. Gunawan', specialty: 'Spesialis Pediatri', avatarUrl: 'https://picsum.photos/seed/103/100/100' },
 ];
 
-export let patients: Patient[] = [
+export const patients: Patient[] = [
   { id: '1', name: 'Budi Sanjoyo', avatarUrl: 'https://picsum.photos/seed/1/40/40', email: 'budi.sanjoyo@example.com', lastVisit: '2023-10-26' },
   { id: '2', name: 'Siti Aminah', avatarUrl: 'https://picsum.photos/seed/2/40/40', email: 'siti.aminah@example.com', lastVisit: '2023-10-25' },
 ];
 
-// Mengubah dari const menjadi let agar bisa dimodifikasi
-export let appointments: Appointment[] = [
+// Mengubah dari let menjadi const untuk mencegah mutasi global
+export const appointments: Appointment[] = [
   { id: 1, patientName: 'Budi Sanjoyo', doctorName: 'Dr. Wahyu', doctorId: 'dr-wahyu', clinic: 'Kardiologi', time: '10:00', status: 'Terkonfirmasi', complaint: 'Nyeri dada', appointment_date: '2024-05-20' },
   { id: 3, patientName: 'Agus Setiawan', doctorName: 'Dr. Wahyu', doctorId: 'dr-wahyu', clinic: 'Kardiologi', time: '13:00', status: 'Menunggu', complaint: 'Pusing dan mual', appointment_date: '2024-05-20' },
   { id: 2, patientName: 'Siti Aminah', doctorName: 'Dr. Indah', doctorId: 'dr-indah', clinic: 'Neurologi', time: '11:30', status: 'Selesai', complaint: 'Sakit kepala sebelah', appointment_date: '2024-05-19' },
@@ -25,7 +25,7 @@ export let appointments: Appointment[] = [
   { id: 10, patientName: 'Anak dari Fitriani', doctorName: 'Dr. Gunawan', doctorId: 'dr-gunawan', clinic: 'Pediatri', time: '10:30', status: 'Terkonfirmasi', complaint: 'Vaksinasi rutin', appointment_date: '2024-05-20' },
 ];
 
-export let medications: Medication[] = [
+export const medications: Medication[] = [
   { id: '1', name: 'Parasetamol', strength: '500mg', stock: 150, lowStockThreshold: 50 },
   { id: '2', name: 'Amoksisilin', strength: '250mg', stock: 80, lowStockThreshold: 30 },
   { id: '3', name: 'Aspirin', strength: '80mg', stock: 200, lowStockThreshold: 50 },
@@ -38,7 +38,7 @@ export let medications: Medication[] = [
   { id: '10', name: 'Cefixime', strength: '100mg', stock: 50, lowStockThreshold: 20 },
 ];
 
-export let medicalRecords: MedicalRecord[] = [
+export const medicalRecords: MedicalRecord[] = [
     { id: 'rec-1', patientName: 'Siti Aminah', doctorName: 'Dr. Indah', date: '2023-11-15', diagnosis: 'Migrain kronis', prescription: 'Sumatriptan 50mg' },
     { id: 'rec-2', patientName: 'Budi Sanjoyo', doctorName: 'Dr. Wahyu', date: '2023-11-14', diagnosis: 'Hipertensi', prescription: 'Lisinopril 10mg' },
 ];

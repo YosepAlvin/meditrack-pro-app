@@ -9,8 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { doctors, appointments } from "@/lib/data"; // Import data
-import type { Doctor } from "@/lib/types";
+import { doctors } from "@/lib/data"; // Import data
 
 export default function BuatJanjiTemuPage() {
     const { toast } = useToast();
@@ -29,9 +28,9 @@ export default function BuatJanjiTemuPage() {
         const selectedDoctor = doctors.find(d => d.id === selectedDoctorId);
         if (!selectedDoctor) return;
 
-        // Buat janji temu baru
+        // Simulasi pengiriman permintaan janji temu
         const newAppointment = {
-            id: appointments.length + 100, // ID sementara yang unik
+            id: Math.random() * 1000,
             patientName: "Budi Sanjoyo", // Nama pasien yang login (hardcoded untuk demo)
             doctorName: selectedDoctor.name,
             doctorId: selectedDoctor.id,
@@ -41,9 +40,6 @@ export default function BuatJanjiTemuPage() {
             complaint: "Keluhan baru",
             appointment_date: new Date().toISOString().slice(0, 10),
         };
-
-        // Tambahkan janji temu baru ke array
-        appointments.unshift(newAppointment);
 
         toast({
             title: `Permintaan Terkirim ke ${selectedDoctor.name}!`,
