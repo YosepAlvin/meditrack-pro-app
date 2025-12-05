@@ -1,3 +1,4 @@
+
 import {
   Card,
   CardContent,
@@ -16,10 +17,31 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button";
 
+function PatientQueueCard() {
+    return (
+        <Card className="bg-primary text-primary-foreground">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Nomor Antrian Anda
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-4xl font-bold">#5</div>
+            <p className="text-xs">untuk Dr. Wahyu - Kardiologi</p>
+            <div className="mt-4">
+                <Badge variant="secondary">Status: Menunggu</Badge>
+            </div>
+          </CardContent>
+        </Card>
+    )
+}
+
+
 export default function PasienDashboardPage() {
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
       <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-3">
+        <PatientQueueCard />
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">

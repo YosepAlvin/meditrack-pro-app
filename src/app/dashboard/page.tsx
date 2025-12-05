@@ -15,10 +15,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import DoctorProfile from '@/components/dashboard/doctor/doctor-profile';
 import PracticeSchedule from '@/components/dashboard/doctor/practice-schedule';
-import PatientQueue from '@/components/dashboard/doctor/patient-queue';
 import RecentMedicalRecords from '@/components/dashboard/doctor/recent-medical-records';
 import Link from 'next/link';
 import { doctors, appointments } from '@/lib/data';
+import Appointments from '@/components/dashboard/appointments';
 
 
 function QuickActions() {
@@ -102,7 +102,7 @@ export default function DashboardPage() {
         {/* Kolom Kiri */}
         <div className="lg:col-span-2 space-y-4">
           <PracticeSchedule />
-          <PatientQueue />
+          <Appointments />
         </div>
         {/* Kolom Kanan */}
         <div className="space-y-4">
