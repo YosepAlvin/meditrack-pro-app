@@ -1,7 +1,6 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
   Table,
@@ -21,8 +20,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import type { Appointment } from "@/lib/types"
-import { MoreHorizontal, PlusCircle, Loader2 } from "lucide-react";
+import { MoreHorizontal, PlusCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { appointments as allAppointments } from '@/lib/data';
+import { doctors } from '@/lib/data';
 
 const statusVariant = (status: Appointment['status']) => {
   switch (status) {
@@ -45,35 +46,12 @@ export default function Appointments() {
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const doctorId = searchParams.get('doctor');
-  
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchAppointments() {
-      setIsLoading(true);
-      try {
-        // Jika ada doctorId di URL, tambahkan sebagai query parameter
-        const url = doctorId ? `/api/appointments?doctorId=${doctorId}` : '/api/appointments';
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error('Gagal mengambil data janji temu');
-        }
-        const data = await response.json();
-        setAppointments(data);
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: error instanceof Error ? error.message : 'Terjadi kesalahan',
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchAppointments();
-  }, [doctorId, toast]);
+  // Filter appointments based on the doctorId from the URL
+  const doctor = doctors.find(d => d.id === doctorId);
+  const appointments = doctorId && doctor
+    ? allAppointments.filter(app => app.doctorName === doctor.name)
+    : allAppointments;
 
 
   const handleAction = (action: string) => {
@@ -96,11 +74,6 @@ export default function Appointments() {
         </Button>
       </CardHeader>
       <CardContent>
-         {isLoading ? (
-          <div className="flex justify-center items-center h-40">
-            <Loader2 className="animate-spin" />
-          </div>
-        ) : (
           <Table>
             <TableHeader>
               <TableRow>
@@ -146,7 +119,6 @@ export default function Appointments() {
               )}
             </TableBody>
           </Table>
-        )}
       </CardContent>
     </Card>
   )
