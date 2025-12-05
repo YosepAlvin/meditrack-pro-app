@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useSearchParams } from 'next/navigation';
 import {
   Table,
   TableBody,
@@ -19,7 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { appointments as initialAppointments } from "@/lib/data"
+import { appointments as allAppointments, doctors } from "@/lib/data"
 import type { Appointment } from "@/lib/types"
 import { MoreHorizontal, PlusCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -42,9 +42,18 @@ const statusVariant = (status: Appointment['status']) => {
 }
 
 export default function Appointments() {
-  const [appointments, setAppointments] = useState<Appointment[]>(initialAppointments);
-  const todaysAppointments = appointments.filter(a => a.status !== 'Dibatalkan');
   const { toast } = useToast();
+  const searchParams = useSearchParams();
+  const doctorId = searchParams.get('doctor');
+  
+  // Find the doctor's name based on the ID from the URL
+  const activeDoctor = doctors.find(d => d.id === doctorId);
+
+  // Filter appointments based on the active doctor's name.
+  // If no doctor is found in URL, show all appointments (for admin view)
+  const filteredAppointments = doctorId 
+    ? allAppointments.filter(a => a.doctorName === activeDoctor?.name && a.status !== 'Dibatalkan')
+    : allAppointments.filter(a => a.status !== 'Dibatalkan');
 
   const handleAction = (action: string) => {
     toast({
@@ -78,7 +87,7 @@ export default function Appointments() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {todaysAppointments.map((appointment) => (
+            {filteredAppointments.length > 0 ? filteredAppointments.map((appointment) => (
               <TableRow key={appointment.id}>
                 <TableCell className="font-medium">{appointment.patientName}</TableCell>
                 <TableCell>{appointment.doctorName}</TableCell>
@@ -102,7 +111,13 @@ export default function Appointments() {
                     </DropdownMenu>
                 </TableCell>
               </TableRow>
-            ))}
+            )) : (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center text-muted-foreground">
+                  Tidak ada janji temu untuk ditampilkan.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </CardContent>
