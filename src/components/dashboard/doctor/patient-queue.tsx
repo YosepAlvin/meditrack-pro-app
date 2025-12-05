@@ -1,5 +1,5 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
   Table,
@@ -33,14 +33,22 @@ export default function PatientQueue() {
     const doctorId = searchParams.get('doctor') || 'dr-wahyu';
     const doctor = doctors.find(d => d.id === doctorId);
 
-    const [appointments, setAppointments] = useState<Appointment[]>(
-        initialAppointments.filter(a => a.doctorName === doctor?.name && a.status !== 'Dibatalkan')
-    );
+    const [appointments, setAppointments] = useState<Appointment[]>([]);
+
+    useEffect(() => {
+        if (doctor) {
+            setAppointments(initialAppointments.filter(a => a.doctorName === doctor.name && a.status !== 'Dibatalkan'));
+        }
+    }, [doctor]);
 
     const handleCallPatient = (id: string) => {
         setAppointments(prev => prev.map(app => {
             if (app.id === id) {
                 return { ...app, status: 'Dipanggil' };
+            }
+            // If another patient was 'Dipanggil', set them back to 'Menunggu'
+            if (app.status === 'Dipanggil') {
+                return { ...app, status: 'Menunggu'};
             }
             return app;
         }));
