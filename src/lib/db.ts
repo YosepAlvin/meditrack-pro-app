@@ -11,6 +11,7 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
+  dateStrings: true // Penting: Mengembalikan tanggal sebagai string, bukan objek Date
 });
 
 export default pool;

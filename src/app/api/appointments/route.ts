@@ -6,11 +6,14 @@ export async function GET(request: Request) {
   const doctorName = searchParams.get('doctorName');
 
   try {
-    let query = 'SELECT * FROM appointments WHERE status != "Dibatalkan"';
-    const params: string[] = [];
+    // Ambil tanggal hari ini dalam format YYYY-MM-DD
+    const today = new Date().toISOString().slice(0, 10);
+    
+    let query = 'SELECT * FROM appointments WHERE status != "Dibatalkan" AND appointment_date = ?';
+    const params: string[] = [today];
 
     if (doctorName) {
-      query += ' AND doctor_name = ?';
+      query += ' AND doctorName = ?'; // Kolom di DB adalah doctorName
       params.push(doctorName);
     }
     
