@@ -98,37 +98,41 @@ export default function Appointments() {
   };
 
   const handlePrescribe = () => {
-    // Tutup dialog terlebih dahulu untuk mencegah UI freeze
+    // 1. Tutup dialog SEGERA untuk menghindari UI freeze.
     setIsPrescriptionDialogOpen(false);
-
+    
+    // 2. Lakukan validasi
     if (!currentPatient || !selectedMedication || quantity <= 0) {
         toast({ title: "Error", description: "Pilih obat dan jumlah yang valid.", variant: "destructive" });
         return;
     }
 
-    const medIndex = allMedications.findIndex(med => med.id === selectedMedication);
-    if (medIndex === -1) return;
-
-    const medToPrescribe = allMedications[medIndex];
+    const medToPrescribe = allMedications.find(med => med.id === selectedMedication);
+    if (!medToPrescribe) {
+        toast({ title: "Error", description: "Obat tidak ditemukan.", variant: "destructive" });
+        return;
+    }
     
     if (medToPrescribe.stock < quantity) {
         toast({ title: "Stok Tidak Cukup!", description: `Stok ${medToPrescribe.name} hanya tersisa ${medToPrescribe.stock}.`, variant: "destructive" });
         return;
     }
     
-    // Kurangi stok obat (hanya pada data mock, di aplikasi nyata ini akan jadi panggilan API)
-    allMedications[medIndex].stock -= quantity;
+    // 3. Modifikasi data MOCK (di dunia nyata ini adalah panggilan API)
+    // Ini tidak akan menyebabkan re-render, hanya untuk simulasi
+    const medIndex = allMedications.findIndex(med => med.id === selectedMedication);
+    if (medIndex !== -1) {
+        allMedications[medIndex].stock -= quantity;
+    }
 
-    const appointmentId = currentPatient.id;
-
-    // Perbarui status janji temu menjadi 'Selesai' di state lokal
-    setAppointments(currentAppointments =>
-      currentAppointments.map(app =>
-        app.id === appointmentId ? { ...app, status: 'Selesai' } : app
+    // 4. Perbarui state untuk memicu re-render yang aman
+    setAppointments(currentApps =>
+      currentApps.map(app =>
+        app.id === currentPatient.id ? { ...app, status: 'Selesai' } : app
       )
     );
 
-    // Tampilkan satu notifikasi yang benar
+    // 5. Tampilkan notifikasi SETELAH semua pembaruan state selesai
     toast({ 
         title: "Resep Diberikan & Selesai!", 
         description: `${quantity} ${medToPrescribe.name} telah diresepkan untuk ${currentPatient.patientName}.` 
