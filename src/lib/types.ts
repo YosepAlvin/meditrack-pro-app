@@ -16,8 +16,8 @@ export type Doctor = {
 export type Appointment = {
   id: number;
   patientName: string;
-  doctorName: string;
-  doctorId: string; // Tambahkan doctorId
+  doctorName?: string; // Dokter bisa jadi tidak ada di awal
+  doctorId: string; 
   clinic: string;
   time: string;
   status: 'Terkonfirmasi' | 'Menunggu' | 'Dibatalkan' | 'Selesai' | 'Dipanggil';
@@ -26,9 +26,9 @@ export type Appointment = {
 };
 
 export type Medication = {
-  id: string;
+  id: number;
   name: string;
-  strength: string;
+  strength: string | null;
   stock: number;
   lowStockThreshold: number;
 };

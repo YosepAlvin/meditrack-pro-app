@@ -33,7 +33,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { Appointment, Medication } from "@/lib/types"
-import { appointments as mockAppointments, medications as mockMedications } from '@/lib/data';
 import { MoreHorizontal, PlusCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Link from 'next/link';
@@ -49,7 +48,7 @@ const statusVariant = (status: Appointment['status']) => {
     case 'Selesai':
         return 'outline';
     case 'Dipanggil':
-        return 'default'; // Or another color
+        return 'default'; 
     default:
       return 'outline';
   }
@@ -61,34 +60,68 @@ export default function Appointments() {
   const doctorId = searchParams.get('doctor');
   
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [medications, setMedications] = useState<Medication[]>(mockMedications);
+  const [medications, setMedications] = useState<Medication[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isPrescriptionDialogOpen, setIsPrescriptionDialogOpen] = useState(false);
   const [currentPatient, setCurrentPatient] = useState<Appointment | null>(null);
   const [selectedMedicationId, setSelectedMedicationId] = useState<string | null>(null);
   const [prescriptionQuantity, setPrescriptionQuantity] = useState(1);
-  
-  useEffect(() => {
+
+  const fetchAppointments = async () => {
     setIsLoading(true);
-    // Salinan mendalam untuk memastikan state terisolasi
-    const allAppointments = JSON.parse(JSON.stringify(mockAppointments));
-    const filtered = doctorId
-      ? allAppointments.filter((app: Appointment) => app.doctorId === doctorId)
-      : allAppointments;
-    setAppointments(filtered);
-    setIsLoading(false);
+    try {
+        const url = doctorId ? `/api/appointments?doctorId=${doctorId}` : '/api/appointments';
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Gagal memuat janji temu.");
+        const data = await response.json();
+        setAppointments(data);
+    } catch (error) {
+        toast({ title: "Error", description: error instanceof Error ? error.message : "Gagal memuat data.", variant: "destructive" });
+    } finally {
+        setIsLoading(false);
+    }
+  }
+
+  const fetchMedications = async () => {
+     try {
+        const response = await fetch('/api/medications');
+        if (!response.ok) throw new Error("Gagal memuat data obat.");
+        const data = await response.json();
+        setMedications(data);
+    } catch (error) {
+        toast({ title: "Error", description: error instanceof Error ? error.message : "Gagal memuat data obat.", variant: "destructive" });
+    }
+  }
+
+  useEffect(() => {
+    fetchAppointments();
+    fetchMedications();
   }, [doctorId]);
 
-  const handleUpdateStatus = (appointmentId: number, newStatus: Appointment['status']) => {
-     setAppointments(prevApps =>
+  const handleUpdateStatus = async (appointmentId: number, newStatus: Appointment['status']) => {
+     // Optimistic UI update
+    setAppointments(prevApps =>
       prevApps.map(app =>
         app.id === appointmentId ? { ...app, status: newStatus } : app
       )
     );
-    toast({
-      title: "Status Diperbarui",
-      description: `Status janji temu telah diubah menjadi ${newStatus}.`,
-    });
+    try {
+      // TODO: Buat API endpoint untuk update status
+      // const response = await fetch(`/api/appointments/${appointmentId}/status`, {
+      //   method: 'PUT',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ status: newStatus }),
+      // });
+      // if (!response.ok) throw new Error("Gagal memperbarui status.");
+      toast({
+        title: "Status Diperbarui",
+        description: `Status janji temu telah diubah menjadi ${newStatus}.`,
+      });
+    } catch (error) {
+       toast({ title: "Error", description: "Gagal memperbarui status.", variant: "destructive" });
+       // Revert UI on error
+       fetchAppointments();
+    }
   };
 
   const openPrescriptionDialog = (appointment: Appointment) => {
@@ -98,46 +131,56 @@ export default function Appointments() {
     setIsPrescriptionDialogOpen(true);
   }
 
-  const handlePrescribe = () => {
-    if (!currentPatient || !selectedMedicationId) return;
-
-    const medication = medications.find(m => m.id === selectedMedicationId);
-    if (!medication) {
-        toast({ title: "Error", description: "Obat tidak ditemukan.", variant: "destructive" });
-        return;
-    }
-    if (medication.stock < prescriptionQuantity) {
-        toast({ title: "Stok Habis!", description: `Stok ${medication.name} tidak mencukupi.`, variant: "destructive" });
+  const handlePrescribe = async () => {
+    if (!currentPatient || !selectedMedicationId || prescriptionQuantity <= 0) {
+        toast({ title: "Input tidak valid", description: "Pilih obat dan jumlah yang benar.", variant: "destructive"});
         return;
     }
 
-    // 1. Update state untuk janji temu menjadi 'Selesai'
-    setAppointments(prevApps =>
-        prevApps.map(app =>
-            app.id === currentPatient.id ? { ...app, status: 'Selesai' } : app
-        )
-    );
-
-    // 2. Update state untuk stok obat
-    setMedications(prevMeds =>
-        prevMeds.map(med =>
-            med.id === selectedMedicationId ? { ...med, stock: Math.max(0, med.stock - prescriptionQuantity) } : med
-        )
-    );
+    const selectedMed = medications.find(m => m.id.toString() === selectedMedicationId);
+    if (!selectedMed || selectedMed.stock < prescriptionQuantity) {
+        toast({ title: "Stok Tidak Cukup", description: `Stok ${selectedMed?.name} tidak mencukupi.`, variant: "destructive"});
+        return;
+    }
     
-    // 3. Tutup dialog
     setIsPrescriptionDialogOpen(false);
 
-    // 4. Tampilkan notifikasi
-    toast({
-        title: "Resep Diberikan!",
-        description: `${prescriptionQuantity} unit ${medication.name} diresepkan untuk ${currentPatient.patientName}. Status pasien: Selesai.`,
-    });
+    try {
+        const response = await fetch('/api/prescribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                appointmentId: currentPatient.id,
+                medicationId: selectedMedicationId,
+                quantity: prescriptionQuantity,
+            }),
+        });
 
-    // 5. Reset state dialog
-    setCurrentPatient(null);
-    setSelectedMedicationId(null);
-    setPrescriptionQuantity(1);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Gagal memberikan resep.");
+        }
+
+        toast({
+            title: "Resep Diberikan!",
+            description: `${prescriptionQuantity} unit ${selectedMed.name} diresepkan untuk ${currentPatient.patientName}.`,
+        });
+
+        // Refresh data untuk melihat perubahan
+        fetchAppointments();
+        fetchMedications();
+
+    } catch (error) {
+        toast({
+            title: "Error",
+            description: error instanceof Error ? error.message : "Terjadi kesalahan server.",
+            variant: "destructive",
+        });
+    } finally {
+        setCurrentPatient(null);
+        setSelectedMedicationId(null);
+        setPrescriptionQuantity(1);
+    }
   };
 
 
@@ -249,7 +292,7 @@ export default function Appointments() {
                         </SelectTrigger>
                         <SelectContent>
                             {medications.map(med => (
-                                <SelectItem key={med.id} value={med.id} disabled={med.stock === 0}>
+                                <SelectItem key={med.id} value={med.id.toString()} disabled={med.stock === 0}>
                                     {med.name} ({med.strength}) - Stok: {med.stock}
                                 </SelectItem>
                             ))}

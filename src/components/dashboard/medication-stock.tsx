@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -19,74 +20,156 @@ import {
   DialogTitle, 
   DialogDescription, 
   DialogFooter, 
-  DialogTrigger 
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { medications as initialMedications } from "@/lib/data"
 import type { Medication } from "@/lib/types";
-import { PlusCircle, MoreHorizontal } from "lucide-react"
+import { PlusCircle, MoreHorizontal, Loader2 } from "lucide-react"
+import { useToast } from "@/hooks/use-toast";
 
 export default function MedicationStock() {
-  const [medications, setMedications] = useState<Medication[]>(initialMedications);
+  const [medications, setMedications] = useState<Medication[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [newMed, setNewMed] = useState({ name: '', strength: '', stock: 0, lowStockThreshold: 10 });
   const [editingMed, setEditingMed] = useState<Medication | null>(null);
+  const [newMed, setNewMed] = useState({ name: '', strength: '', stock: 0, lowStockThreshold: 10 });
+  const { toast } = useToast();
 
-
-  const handleStockChange = (medId: string, amount: number) => {
-    setMedications(meds => 
-      meds.map(med => 
-        med.id === medId 
-        ? { ...med, stock: Math.max(0, med.stock + amount) } 
-        : med
-      )
-    );
-  };
-
-  const handleSaveMedication = () => {
-    if (editingMed) {
-      // Logic for updating an existing medication
-      setMedications(meds => meds.map(m => m.id === editingMed.id ? { ...editingMed, ...newMed, stock: Number(newMed.stock) || 0, lowStockThreshold: Number(newMed.lowStockThreshold) || 0 } : m));
-    } else {
-      // Logic for adding a new medication
-      const newMedication: Medication = {
-        id: `med-${Date.now()}`,
-        ...newMed,
-        stock: Number(newMed.stock) || 0,
-        lowStockThreshold: Number(newMed.lowStockThreshold) || 0
-      };
-      setMedications(meds => [...meds, newMedication]);
+  async function fetchMedications() {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/medications');
+      if (!response.ok) throw new Error("Gagal mengambil data obat.");
+      const data = await response.json();
+      setMedications(data);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Terjadi kesalahan",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
-    closeDialog();
-  };
-  
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setNewMed(prev => ({ ...prev, [name]: value }));
-  };
+  }
 
-  const openEditDialog = (med: Medication) => {
-    setEditingMed(med);
-    setNewMed({ name: med.name, strength: med.strength, stock: med.stock, lowStockThreshold: med.lowStockThreshold });
-    setIsDialogOpen(true);
-  };
-  
+  useEffect(() => {
+    fetchMedications();
+  }, []);
+
   const openAddDialog = () => {
     setEditingMed(null);
     setNewMed({ name: '', strength: '', stock: 0, lowStockThreshold: 10 });
     setIsDialogOpen(true);
-  }
+  };
 
+  const openEditDialog = (med: Medication) => {
+    setEditingMed(med);
+    setNewMed({ name: med.name, strength: med.strength || '', stock: med.stock, lowStockThreshold: med.lowStockThreshold });
+    setIsDialogOpen(true);
+  };
+  
   const closeDialog = () => {
     setIsDialogOpen(false);
     setEditingMed(null);
   };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setNewMed(prev => ({ ...prev, [name]: value }));
+  };
   
-  const handleDeleteMedication = (id: string) => {
-    setMedications(meds => meds.filter(m => m.id !== id));
-  }
+  const handleSaveMedication = async () => {
+    try {
+      const url = editingMed ? `/api/medications/${editingMed.id}` : '/api/medications';
+      const method = editingMed ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...newMed,
+          stock: Number(newMed.stock),
+          lowStockThreshold: Number(newMed.lowStockThreshold)
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Gagal menyimpan data obat.');
+      }
+      
+      toast({
+        title: "Sukses",
+        description: `Data obat berhasil ${editingMed ? 'diperbarui' : 'ditambahkan'}.`,
+      });
+      fetchMedications(); // Refresh data
+      closeDialog();
+
+    } catch (error) {
+        toast({
+            title: "Error",
+            description: error instanceof Error ? error.message : "Terjadi kesalahan",
+            variant: "destructive",
+        });
+    }
+  };
+
+  const handleDeleteMedication = async (id: number) => {
+    if (!confirm('Apakah Anda yakin ingin menghapus obat ini?')) return;
+
+    try {
+      const response = await fetch(`/api/medications/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Gagal menghapus obat.');
+      }
+
+      toast({
+        title: "Sukses",
+        description: "Obat berhasil dihapus.",
+      });
+      fetchMedications(); // Refresh data
+
+    } catch (error) {
+       toast({
+            title: "Error",
+            description: error instanceof Error ? error.message : "Gagal menghapus obat.",
+            variant: "destructive",
+        });
+    }
+  };
+
+  const handleStockChange = async (med: Medication, amount: number) => {
+    const newStock = Math.max(0, med.stock + amount);
+    try {
+      const response = await fetch(`/api/medications/${med.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...med, stock: newStock }),
+      });
+       if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Gagal mengubah stok.');
+      }
+      toast({
+        title: "Stok Diperbarui",
+        description: `Stok ${med.name} diubah menjadi ${newStock}.`,
+      });
+      fetchMedications();
+    } catch (error) {
+       toast({
+            title: "Error",
+            description: error instanceof Error ? error.message : "Gagal mengubah stok.",
+            variant: "destructive",
+        });
+    }
+  };
+
 
   return (
     <Card className="shadow-md">
@@ -101,49 +184,55 @@ export default function MedicationStock() {
         </Button>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Obat</TableHead>
-              <TableHead>Stok</TableHead>
-              <TableHead className="text-right">Tindakan</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {medications.map((med) => (
-              <TableRow key={med.id}>
-                <TableCell className="font-medium">
-                  <div>{med.name}</div>
-                  <div className="text-xs text-muted-foreground">{med.strength}</div>
-                </TableCell>
-                <TableCell>
-                   <Badge variant={med.stock <= med.lowStockThreshold ? "destructive" : "outline"}>
-                    {med.stock}
-                  </Badge>
-                  {med.stock <= med.lowStockThreshold && 
-                    <p className="text-xs text-destructive mt-1">Stok Rendah</p>
-                  }
-                </TableCell>
-                <TableCell className="text-right space-x-2">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Buka menu</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleStockChange(med.id, 10)}>Tambah 10</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleStockChange(med.id, -10)}>Kurangi 10</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => openEditDialog(med)}>Edit</DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive hover:text-destructive" onClick={() => handleDeleteMedication(med.id)}>Hapus</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        {isLoading ? (
+            <div className="flex justify-center items-center h-40">
+                <Loader2 className="animate-spin" />
+            </div>
+        ) : (
+            <Table>
+            <TableHeader>
+                <TableRow>
+                <TableHead>Obat</TableHead>
+                <TableHead>Stok</TableHead>
+                <TableHead className="text-right">Tindakan</TableHead>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                {medications.map((med) => (
+                <TableRow key={med.id}>
+                    <TableCell className="font-medium">
+                    <div>{med.name}</div>
+                    <div className="text-xs text-muted-foreground">{med.strength}</div>
+                    </TableCell>
+                    <TableCell>
+                    <Badge variant={med.stock <= med.lowStockThreshold ? "destructive" : "outline"}>
+                        {med.stock}
+                    </Badge>
+                    {med.stock <= med.lowStockThreshold && 
+                        <p className="text-xs text-destructive mt-1">Stok Rendah</p>
+                    }
+                    </TableCell>
+                    <TableCell className="text-right space-x-2">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Buka menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleStockChange(med, 10)}>Tambah 10</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleStockChange(med, -10)}>Kurangi 10</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => openEditDialog(med)}>Edit</DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => handleDeleteMedication(med.id)}>Hapus</DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    </TableCell>
+                </TableRow>
+                ))}
+            </TableBody>
+            </Table>
+        )}
       </CardContent>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogContent>
