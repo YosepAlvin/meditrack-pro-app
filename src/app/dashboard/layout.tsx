@@ -18,12 +18,15 @@ import {
   SidebarInset,
 } from '@/components/ui/sidebar';
 import ActiveLink from "@/components/active-link";
-import { Suspense } from "react";
 import ClientHeader from "@/components/client-header";
 
-function DashboardContent({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-      <SidebarProvider>
+    <SidebarProvider>
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center gap-2 p-2">
@@ -74,17 +77,5 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         {children}
       </SidebarInset>
     </SidebarProvider>
-  )
-}
-
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <DashboardContent>{children}</DashboardContent>
-    </Suspense>
   );
 }
