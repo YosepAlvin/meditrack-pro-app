@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -6,6 +9,12 @@ import { patients } from "@/lib/data"
 import { Search } from "lucide-react"
 
 export default function PatientLookup() {
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredPatients = patients.filter((patient) =>
+    patient.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <Card className="shadow-md">
       <CardHeader>
@@ -15,11 +24,16 @@ export default function PatientLookup() {
       <CardContent className="flex flex-col gap-4">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Cari pasien..." className="pl-10" />
+          <Input 
+            placeholder="Cari pasien..." 
+            className="pl-10" 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
         <ScrollArea className="h-64">
           <div className="space-y-4 pr-4">
-            {patients.map((patient) => (
+            {filteredPatients.map((patient) => (
               <div key={patient.id} className="flex items-center gap-4 p-2 rounded-lg hover:bg-secondary">
                 <Avatar className="h-10 w-10 border">
                   <AvatarImage src={patient.avatarUrl} alt={patient.name} data-ai-hint="person portrait" />
