@@ -13,7 +13,7 @@ export async function GET(request: Request) {
     const params: string[] = [today];
 
     if (doctorName) {
-      query += ' AND doctorName = ?'; // Kolom di DB adalah doctorName
+      query += ' AND doctorName = ?';
       params.push(doctorName);
     }
     
